@@ -1,0 +1,16 @@
+{
+  "name": "thingifier_api_testing",
+  "version": "1.0.0",
+  "description": "thingifier api testing",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "WB, EC, LB, KM",
+  "license": "ISC",
+  "devDependencies": {
+    "chai": "*",
+    "mocha": "*",
+    "chai-http": "*"
+  }
+}
