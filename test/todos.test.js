@@ -439,7 +439,7 @@ describe('Test for todos endpoints', function () {
         const id = 1;
         const res = await chai.request(host).put(`/todos/${id}`).send(body);
         expect(res).to.have.status(400);
-        
+
         /* FAILURE - Title is not supposed to be mandatory
         From the documentation, the body should only contain properties that we want to amend. So, not putting
         the title is supposed to be fine. However, it returns an error saying that the title is a mandatory field
@@ -643,6 +643,7 @@ describe('Test for todos endpoints', function () {
         /* FAILURE - The response should be a message, not a java exception.
         The system should handle the error when an unexpected property is sent in the body. There shouldn't be internal
         errors shown to the client such as NullPointerException.
+        This is the payload we receive { errorMessages: [`java.lang.NullPointerException`] }
         */
     });
 
@@ -680,6 +681,7 @@ describe('Test for todos endpoints', function () {
         /* FAILURE - Appropriate error message should be displayed
         The system should handle the error when an unexpected property is sent in the body. There should't be internal
         errors shown to the client such as NullPointerException.
+        This is the payload we receive { errorMessages: [`java.lang.NullPointerException`] }
         */
     });
 
@@ -761,6 +763,7 @@ describe('Test for todos endpoints', function () {
         /* FAILURE - Appropriate error message should be displayed
         The system should handle the error when an unexpected property is sent in the body. There should't be internal
         errors shown to the client such as NullPointerException.
+        This is the payload we receive { errorMessages: [`java.lang.NullPointerException`] }
         */
     });
 
