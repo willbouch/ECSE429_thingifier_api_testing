@@ -41,7 +41,7 @@ describe('Test for categories endpoints', function () {
         const res = await chai.request(host).get('/categories');
         expect(res).to.have.status(200);
         expect(res.body.categories.length).to.equal(defaultCategoriesObject.categories.length);
-        expect(res.body).to.deep.equal(defaultCategoriesObject);
+        expect(res.body.categories.sort((a, b) => a.id - b.id)).to.deep.equal(defaultCategoriesObject.categories);
     });
 
     it('GET /categories: should get all categories with filter on the title', async function () {
