@@ -181,16 +181,6 @@ describe('Test for todos endpoints', function () {
         expect(res.body).to.deep.equal({ errorMessages: ['Failed Validation: doneStatus should be BOOLEAN'] });
     });
 
-    it('POST /todos: should throw error when creating todo with non boolean for doneStatus', async function () {
-        const body = {
-            title: 'Some title',
-            doneStatus: 'true'
-        };
-        const res = await chai.request(host).post('/todos').send(body);
-        expect(res).to.have.status(400);
-        expect(res.body).to.deep.equal({ errorMessages: ['Failed Validation: doneStatus should be BOOLEAN'] });
-    });
-
     it('HEAD /todos: should return headers for all the instances of todo', async function () {
         const res = await chai.request(host).head('/todos');
         expect(res).to.have.status(200);
@@ -268,7 +258,7 @@ describe('Test for todos endpoints', function () {
         });
         expect((await chai.request(host).get('/todos')).body.todos.length).equal(defaultTodosObject.todos.length);
     });
-    
+
     it('POST /todos/:id: should change the description property of a specific todo in XML format', async function () {
         const body = `
             <todo>
@@ -335,7 +325,7 @@ describe('Test for todos endpoints', function () {
         expect(res).to.have.status(200);
         expect({
             ...res.body,
-            doneStatus: !res.body.doneStatus
+            doneStatus: !!res.body.doneStatus
         }).to.deep.equal({
             ...defaultTodosObject.todos.find(e => e.id == id),
             title: body.title
@@ -448,9 +438,10 @@ describe('Test for todos endpoints', function () {
             id: projectId.toString()
         };
         await chai.request(host).delete(`/todos/${todoId}/tasksof/${projectId}`);
-        await chai.request(host).post(`/todos/${todoId}/tasksof`).send(body);
+        const postRes = await chai.request(host).post(`/todos/${todoId}/tasksof`).send(body);
         const res = await chai.request(host).get(`/todos/${todoId}/tasksof`);
         expect(res).to.have.status(200);
+        expect(postRes).to.have.status(201);
         expect(res.body.projects.length).to.be.greaterThan(0);
         expect(res.body.projects[0].id).to.deep.equal(projectId.toString());
     });
@@ -462,9 +453,10 @@ describe('Test for todos endpoints', function () {
             id: projectId
         };
         await chai.request(host).delete(`/todos/${todoId}/tasksof/${projectId}`);
-        await chai.request(host).post(`/todos/${todoId}/tasksof`).send(body);
+        const postRes = await chai.request(host).post(`/todos/${todoId}/tasksof`).send(body);
         const res = await chai.request(host).get(`/todos/${todoId}/tasksof`);
         expect(res).to.have.status(200);
+        expect(postRes).to.have.status(201);
         expect(res.body.projects.length).to.be.greaterThan(0);
         expect(res.body.projects[0].id).to.deep.equal(projectId.toString());
 
@@ -480,9 +472,10 @@ describe('Test for todos endpoints', function () {
     it('DELETE /todos/:id/tasksof/:id: should delete relationship between specific todo and project', async function () {
         const todoId = 1;
         const projectId = 1;
-        await chai.request(host).delete(`/todos/${todoId}/tasksof/${projectId}`);
+        const deleteRes = await chai.request(host).delete(`/todos/${todoId}/tasksof/${projectId}`);
         const res = await chai.request(host).get(`/todos/${todoId}/tasksof`);
         expect(res).to.have.status(200);
+        expect(deleteRes).to.have.status(200);
         expect(res.body.projects).to.be.empty
     });
 
@@ -509,9 +502,10 @@ describe('Test for todos endpoints', function () {
             id: categoryId.toString()
         };
         await chai.request(host).delete(`/todos/${todoId}/categories/${categoryId}`);
-        await chai.request(host).post(`/todos/${todoId}/categories`).send(body);
+        const postRes = await chai.request(host).post(`/todos/${todoId}/categories`).send(body);
         const res = await chai.request(host).get(`/todos/${todoId}/categories`);
         expect(res).to.have.status(200);
+        expect(postRes).to.have.status(201);
         expect(res.body.categories.length).to.be.greaterThan(0);
         expect(res.body.categories[0].id).to.deep.equal(categoryId.toString());
     });
@@ -523,9 +517,10 @@ describe('Test for todos endpoints', function () {
             id: categoryId
         };
         await chai.request(host).delete(`/todos/${todoId}/categories/${categoryId}`);
-        await chai.request(host).post(`/todos/${todoId}/categories`).send(body);
+        const postRes = await chai.request(host).post(`/todos/${todoId}/categories`).send(body);
         const res = await chai.request(host).get(`/todos/${todoId}/categories`);
         expect(res).to.have.status(200);
+        expect(postRes).to.have.status(200);
         expect(res.body.categories.length).to.be.greaterThan(0);
         expect(res.body.categories[0].id).to.deep.equal(categoryId.toString());
 
@@ -541,9 +536,10 @@ describe('Test for todos endpoints', function () {
     it('DELETE /todos/:id/categories/:id: should delete relationship between specific todo and category', async function () {
         const todoId = 1;
         const categoryId = 1;
-        await chai.request(host).delete(`/todos/${todoId}/categories/${categoryId}`);
+        const deleteRes = await chai.request(host).delete(`/todos/${todoId}/categories/${categoryId}`);
         const res = await chai.request(host).get(`/todos/${todoId}/categories`);
         expect(res).to.have.status(200);
+        expect(deleteRes).to.have.status(200);
         expect(res.body.categories).to.be.empty
     });
 });
