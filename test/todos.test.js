@@ -56,21 +56,25 @@ describe('Test for todos endpoints', function () {
 
     it('GET /todos: should get all todos', async function () {
         const res = await chai.request(host).get('/todos');
+        expect(res).to.have.status(200);
         expect(res.body.todos.length).to.equal(defaultTodosObject.todos.length);
     });
 
     it('GET /todos: should get all todos with filter on the title', async function () {
         const res = await chai.request(host).get('/todos?title=scan+paperwork');
+        expect(res).to.have.status(200);
         expect(res.body.todos.length).to.equal(1);
     });
 
     it('GET /todos: should get no todos when filtering with unexisting description', async function () {
         const res = await chai.request(host).get('/todos?description=whatever');
+        expect(res).to.have.status(200);
         expect(res.body.todos.length).to.equal(0);
     });
 
     it('GET /todos: should get todos when filtering with doneStatus', async function () {
         const res = await chai.request(host).get('/todos?doneStatus=false');
+        expect(res).to.have.status(200);
         expect(res.body.todos.length).to.equal(defaultTodosObject.todos.length);
     });
 
@@ -81,6 +85,7 @@ describe('Test for todos endpoints', function () {
             description: 'Some description',
         };
         const res = await chai.request(host).post('/todos').send(body);
+        expect(res).to.have.status(201);
         expect({
             ...res.body,
             doneStatus: !!res.body.doneStatus
@@ -99,6 +104,7 @@ describe('Test for todos endpoints', function () {
             </todo>
         `;
         const res = await chai.request(host).post('/todos').set('content-type', 'application/xml').send(body);
+        expect(res).to.have.status(201);
         expect({
             ...res.body,
             doneStatus: !!res.body.doneStatus
@@ -115,6 +121,7 @@ describe('Test for todos endpoints', function () {
             title: 'Some title',
         }
         const res = await chai.request(host).post('/todos').send(body);
+        expect(res).to.have.status(201);
         expect({
             ...res.body,
         }).to.deep.include({
@@ -130,6 +137,7 @@ describe('Test for todos endpoints', function () {
             </todo>
         `;
         const res = await chai.request(host).post('/todos').set('content-type', 'application/xml').send(body);
+        expect(res).to.have.status(201);
         expect({
             ...res.body,
             doneStatus: !!res.body.doneStatus
@@ -145,6 +153,7 @@ describe('Test for todos endpoints', function () {
             description: 'Some description'
         }
         const res = await chai.request(host).post('/todos').send(body);
+        expect(res).to.have.status(201);
         expect({
             ...res.body,
         }).to.deep.include({
@@ -158,6 +167,7 @@ describe('Test for todos endpoints', function () {
             description: 'Some description'
         };
         const res = await chai.request(host).post('/todos').send(body);
+        expect(res).to.have.status(400);
         expect(res.body).to.deep.equal({ errorMessages: ['title : field is mandatory'] })
     });
 
@@ -167,6 +177,7 @@ describe('Test for todos endpoints', function () {
             doneStatus: 'true'
         };
         const res = await chai.request(host).post('/todos').send(body);
+        expect(res).to.have.status(400);
         expect(res.body).to.deep.equal({ errorMessages: ['Failed Validation: doneStatus should be BOOLEAN'] });
     });
 
@@ -176,17 +187,20 @@ describe('Test for todos endpoints', function () {
             doneStatus: 'true'
         };
         const res = await chai.request(host).post('/todos').send(body);
+        expect(res).to.have.status(400);
         expect(res.body).to.deep.equal({ errorMessages: ['Failed Validation: doneStatus should be BOOLEAN'] });
     });
 
     it('HEAD /todos: should return headers for all the instances of todo', async function () {
         const res = await chai.request(host).head('/todos');
+        expect(res).to.have.status(200);
         expect(res.header).to.not.be.empty
     });
 
     it('GET /todos/:id: should get todo with specific id', async function () {
         const id = 1;
         const res = await chai.request(host).get(`/todos/${id}`);
+        expect(res).to.have.status(200);
         expect({
             ...res.body.todos[0],
             doneStatus: !!res.body.todos.doneStatus,
@@ -198,6 +212,7 @@ describe('Test for todos endpoints', function () {
     it('GET /todos/:id: fail to get todo with unexisting id', async function () {
         const id = 123;
         const res = await chai.request(host).get(`/todos/${id}`);
+        expect(res).to.have.status(404);
         expect(res.body).to.deep.equal({ errorMessages: [`Could not find an instance with todos/${id}`] });
     });
 
@@ -207,6 +222,7 @@ describe('Test for todos endpoints', function () {
         };
         const id = 1;
         const res = await chai.request(host).post(`/todos/${id}`).send(body);
+        expect(res).to.have.status(200);
         expect({
             ...res.body,
             doneStatus: !res.body.doneStatus
@@ -225,6 +241,7 @@ describe('Test for todos endpoints', function () {
         `;
         const id = 1;
         const res = await chai.request(host).post(`/todos/${id}`).set('content-type', 'application/xml').send(body);
+        expect(res).to.have.status(200);
         expect({
             ...res.body,
             doneStatus: !res.body.doneStatus
@@ -241,6 +258,7 @@ describe('Test for todos endpoints', function () {
         };
         const id = 1;
         const res = await chai.request(host).post(`/todos/${id}`).send(body);
+        expect(res).to.have.status(200);
         expect({
             ...res.body,
             doneStatus: !res.body.doneStatus
@@ -259,6 +277,7 @@ describe('Test for todos endpoints', function () {
         `;
         const id = 1;
         const res = await chai.request(host).post(`/todos/${id}`).set('content-type', 'application/xml').send(body);
+        expect(res).to.have.status(200);
         expect({
             ...res.body,
             doneStatus: !res.body.doneStatus
@@ -275,6 +294,7 @@ describe('Test for todos endpoints', function () {
         };
         const id = 1;
         const res = await chai.request(host).post(`/todos/${id}`).send(body);
+        expect(res).to.have.status(200);
         expect({
             ...res.body,
             doneStatus: !!res.body.doneStatus
@@ -293,6 +313,7 @@ describe('Test for todos endpoints', function () {
         };
         const id = 1;
         const res = await chai.request(host).post(`/todos/${id}`).send(body);
+        expect(res).to.have.status(200);
         expect({
             ...res.body,
             doneStatus: !!res.body.doneStatus
@@ -311,6 +332,7 @@ describe('Test for todos endpoints', function () {
         };
         const id = 1;
         const res = await chai.request(host).put(`/todos/${id}`).send(body);
+        expect(res).to.have.status(200);
         expect({
             ...res.body,
             doneStatus: !res.body.doneStatus
@@ -329,6 +351,7 @@ describe('Test for todos endpoints', function () {
         };
         const id = 1;
         const res = await chai.request(host).put(`/todos/${id}`).send(body);
+        expect(res).to.have.status(200);
         expect({
             ...res.body,
         }).to.deep.equal({
@@ -340,7 +363,7 @@ describe('Test for todos endpoints', function () {
         // FAILURE - Title is not suppose to be mandatory
     });
 
-    it.only('PUT /todos/:id: should change the description property of a specific todo in XML format - BUG', async function () {
+    it('PUT /todos/:id: should change the description property of a specific todo in XML format - BUG', async function () {
         const body = `
             <todo>
                 <description>Some description - Changed</description>
@@ -348,6 +371,7 @@ describe('Test for todos endpoints', function () {
         `;
         const id = 1;
         const res = await chai.request(host).put(`/todos/${id}`).set('content-type', 'application/xml').send(body);
+        expect(res).to.have.status(200);
         expect({
             ...res.body,
         }).to.deep.equal({
@@ -367,6 +391,7 @@ describe('Test for todos endpoints', function () {
         };
         const id = 1;
         const res = await chai.request(host).post(`/todos/${id}`).send(body);
+        expect(res).to.have.status(200);
         expect({
             ...res.body,
             doneStatus: !!res.body.doneStatus
@@ -381,31 +406,36 @@ describe('Test for todos endpoints', function () {
 
     it('DELETE /todos/:id: should delete specific todo', async function () {
         const id = 1;
-        await chai.request(host).delete(`/todos/${id}`);
+        const res = await chai.request(host).delete(`/todos/${id}`);
+        expect(res).to.have.status(200);
         expect((await chai.request(host).get('/todos')).body.todos.length).equal(defaultTodosObject.todos.length - 1);
     });
 
     it('DELETE /todos/:id: should not delete specific todo if unexisting id', async function () {
         const id = 123;
         const res = await chai.request(host).delete(`/todos/${id}`);
+        expect(res).to.have.status(404);
         expect(res.body).to.deep.equal({ errorMessages: [`Could not find any instances with todos/${id}`] });
         expect((await chai.request(host).get('/todos')).body.todos.length).equal(defaultTodosObject.todos.length);
     });
 
     it('HEAD /todos/:id: should return headers for a specific instances of todo using a id', async function () {
         const res = await chai.request(host).head('/todos/1');
+        expect(res).to.have.status(200);
         expect(res.header).to.not.be.empty
     });
 
     it('GET /todos/:id/tasksof: should get all the project items related to specific todo', async function () {
         const id = 1;
         const res = await chai.request(host).get(`/todos/${id}/tasksof`);
+        expect(res).to.have.status(200);
         expect(res.body.projects[0].id).to.deep.equal(defaultTodosObject.todos.find(e => e.id == id).tasksof[0].id);
     });
 
     it('GET /todos/:id/tasksof: should not get all related project items related to unexisting todo - BUG', async function () {
         const id = 123;
         const res = await chai.request(host).get(`/todos/${id}/tasksof`);
+        expect(res).to.have.status(404);
         expect(res.body).to.deep.equal({ errorMessages: [`Could not find related projects for instance with todos/${id}`] });
 
         // FAILURE - Should not be returning any information except an error message
@@ -420,6 +450,7 @@ describe('Test for todos endpoints', function () {
         await chai.request(host).delete(`/todos/${todoId}/tasksof/${projectId}`);
         await chai.request(host).post(`/todos/${todoId}/tasksof`).send(body);
         const res = await chai.request(host).get(`/todos/${todoId}/tasksof`);
+        expect(res).to.have.status(200);
         expect(res.body.projects.length).to.be.greaterThan(0);
         expect(res.body.projects[0].id).to.deep.equal(projectId.toString());
     });
@@ -433,6 +464,7 @@ describe('Test for todos endpoints', function () {
         await chai.request(host).delete(`/todos/${todoId}/tasksof/${projectId}`);
         await chai.request(host).post(`/todos/${todoId}/tasksof`).send(body);
         const res = await chai.request(host).get(`/todos/${todoId}/tasksof`);
+        expect(res).to.have.status(200);
         expect(res.body.projects.length).to.be.greaterThan(0);
         expect(res.body.projects[0].id).to.deep.equal(projectId.toString());
 
@@ -441,6 +473,7 @@ describe('Test for todos endpoints', function () {
 
     it('HEAD /todos/:id/tasksof: should return headers for the project items related to todo, with given id', async function () {
         const res = await chai.request(host).head('/todos/1/tasksof');
+        expect(res).to.have.status(200);
         expect(res.header).to.not.be.empty
     });
 
@@ -449,18 +482,21 @@ describe('Test for todos endpoints', function () {
         const projectId = 1;
         await chai.request(host).delete(`/todos/${todoId}/tasksof/${projectId}`);
         const res = await chai.request(host).get(`/todos/${todoId}/tasksof`);
+        expect(res).to.have.status(200);
         expect(res.body.projects).to.be.empty
     });
 
     it('GET /todos/:id/categories: should get all the category items related to specific todo', async function () {
         const id = 1;
         const res = await chai.request(host).get(`/todos/${id}/categories`);
+        expect(res).to.have.status(200);
         expect(res.body.categories[0].id).to.deep.equal(defaultTodosObject.todos.find(e => e.id == id).categories[0].id);
     });
 
     it('GET /todos/:id/categories: should not get all related category items related to unexisting todo - BUG', async function () {
         const id = 123;
         const res = await chai.request(host).get(`/todos/${id}/categories`);
+        expect(res).to.have.status(404);
         expect(res.body).to.deep.equal({ errorMessages: [`Could not find related categories for instance with todos/${id}`] });
 
         // FAILURE - Should not be returning any information except an error message
@@ -475,6 +511,7 @@ describe('Test for todos endpoints', function () {
         await chai.request(host).delete(`/todos/${todoId}/categories/${categoryId}`);
         await chai.request(host).post(`/todos/${todoId}/categories`).send(body);
         const res = await chai.request(host).get(`/todos/${todoId}/categories`);
+        expect(res).to.have.status(200);
         expect(res.body.categories.length).to.be.greaterThan(0);
         expect(res.body.categories[0].id).to.deep.equal(categoryId.toString());
     });
@@ -488,6 +525,7 @@ describe('Test for todos endpoints', function () {
         await chai.request(host).delete(`/todos/${todoId}/categories/${categoryId}`);
         await chai.request(host).post(`/todos/${todoId}/categories`).send(body);
         const res = await chai.request(host).get(`/todos/${todoId}/categories`);
+        expect(res).to.have.status(200);
         expect(res.body.categories.length).to.be.greaterThan(0);
         expect(res.body.categories[0].id).to.deep.equal(categoryId.toString());
 
@@ -496,6 +534,7 @@ describe('Test for todos endpoints', function () {
 
     it('HEAD /todos/:id/categories: should return headers for the category items related to todo, with given id', async function () {
         const res = await chai.request(host).head('/todos/1/categories');
+        expect(res).to.have.status(200);
         expect(res.header).to.not.be.empty
     });
 
@@ -504,6 +543,7 @@ describe('Test for todos endpoints', function () {
         const categoryId = 1;
         await chai.request(host).delete(`/todos/${todoId}/categories/${categoryId}`);
         const res = await chai.request(host).get(`/todos/${todoId}/categories`);
+        expect(res).to.have.status(200);
         expect(res.body.categories).to.be.empty
     });
 });
