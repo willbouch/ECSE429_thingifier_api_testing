@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const child_process = require('child_process');
+const exec = require('child_process').exec;
 
 chai.use(chaiHttp);
 
@@ -52,6 +53,27 @@ describe('Test for todos endpoints', function () {
     afterEach(async function () {
         server.kill();
         await new Promise(resolve => setTimeout(resolve, 300));
+    });
+
+    /*
+    * The following two tests are curl requests tests. We do two simple requests to show that the API can correctly respond to such requests.
+    */
+
+    it('GET /todos: should get all todos when making the request with cURL', async function () {
+        const command = "curl -i -X GET \
+        http://localhost:4567/todos"
+        child = exec(command, function(error, stdout, stderr){
+            expect(stdout.toString()).to.include('200 OK');
+        });
+    });
+
+    it('DELETE /todos/:id: should delete specific todo when making the request with cURL', async function () {
+        const command = "curl -i -X DELETE \
+        http://localhost:4567/todos/2"
+
+        child = exec(command, function(error, stdout, stderr){
+            expect(stdout.toString()).to.include('200 OK');
+        });
     });
 
     it('GET /todos: should get all todos', async function () {
