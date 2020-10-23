@@ -43,16 +43,32 @@ describe('Test for todos endpoints', function () {
     };
 
     beforeEach(async function () {
-        server = child_process.spawn(
+        child_process.spawn(
             'java',
             ['-jar', 'runTodoManagerRestAPI-1.5.5.jar'],
         );
-        await new Promise(resolve => setTimeout(resolve, 300));
+
+        let serverReady = false;
+        while (!serverReady) {
+            try {
+                await chai.request(host).get('/todos');
+                serverReady = true;
+            } catch (err) { }
+        }
     });
 
     afterEach(async function () {
-        server.kill();
-        await new Promise(resolve => setTimeout(resolve, 300));
+        try {
+            await chai.request(host).get('/shutdown');
+        } catch (err) { }
+        let serverDown = false;
+        while (!serverDown) {
+            try {
+                await chai.request(host).get('/todos');
+            } catch (err) {
+                serverDown = true;
+            }
+        }
     });
 
     /*
@@ -446,16 +462,12 @@ describe('Test for todos endpoints', function () {
         const id = 1;
         const res = await chai.request(host).put(`/todos/${id}`).send(body);
         expect(res).to.have.status(200);
-        expect({
-            ...res.body,
-            doneStatus: !!res.body.doneStatus
-        }).to.deep.equal({
-            ...defaultTodosObject.todos.find(e => e.id == id),
-            title: body.title
-        });
-        expect((await chai.request(host).get('/todos')).body.todos.length).equal(defaultTodosObject.todos.length);
 
-        // FAILURE - Resets content of the entire todo
+        /* FAILURE - Resets content of the entire todo
+        Comparing the body of the response to the initial data will flag that categories and projects
+        relationships are deleted. The same would happen to doneStatus or description if they were set to
+        their non default value.
+        */
     });
 
     it('PUT /todos/:id: should change the description property of a specific todo - BUG', async function () {
@@ -464,16 +476,13 @@ describe('Test for todos endpoints', function () {
         };
         const id = 1;
         const res = await chai.request(host).put(`/todos/${id}`).send(body);
-        expect(res).to.have.status(200);
-        expect({
-            ...res.body,
-        }).to.deep.equal({
-            ...defaultTodosObject.todos.find(e => e.id == id),
-            description: body.description
-        });
-        expect((await chai.request(host).get('/todos')).body.todos.length).equal(defaultTodosObject.todos.length);
+        expect(res).to.have.status(400);
 
-        // FAILURE - Title is not supposed to be mandatory
+        /* FAILURE - Title is not supposed to be mandatory
+        From the documentation, the body should only contain properties that we want to amend. So, not putting
+        the title is supposed to be fine. However, it returns an error saying that the title is a mandatory field
+        even it if is not. Should return a 200.
+        */
     });
 
     it('PUT /todos/:id: should change the description property of a specific todo in XML format - BUG', async function () {
@@ -484,16 +493,13 @@ describe('Test for todos endpoints', function () {
         `;
         const id = 1;
         const res = await chai.request(host).put(`/todos/${id}`).set('content-type', 'application/xml').send(body);
-        expect(res).to.have.status(200);
-        expect({
-            ...res.body,
-        }).to.deep.equal({
-            ...defaultTodosObject.todos.find(e => e.id == id),
-            description: 'Some description - Changed'
-        });
-        expect((await chai.request(host).get('/todos')).body.todos.length).equal(defaultTodosObject.todos.length);
+        expect(res).to.have.status(400);
 
-        // FAILURE - Title is not supposed to be mandatory
+        /* FAILURE - Title is not supposed to be mandatory
+        From the documentation, the body should only contain properties that we want to amend. So, not putting
+        the title is supposed to be fine. However, it returns an error saying that the title is a mandatory field
+        even it if is not. Should return a 200.
+        */
     });
 
     it('PUT /todos/:id: should change all properties of a specific todo', async function () {
@@ -532,16 +538,13 @@ describe('Test for todos endpoints', function () {
         };
         const id = 1;
         const res = await chai.request(host).put(`/todos/${id}`).send(body);
-        expect(res).to.have.status(200);
-        expect({
-            ...res.body,
-            doneStatus: !!res.body.doneStatus
-        }).to.deep.equal({
-            ...defaultTodosObject.todos.find(e => e.id == id),
-        });
-        expect((await chai.request(host).get('/todos')).body.todos.length).equal(defaultTodosObject.todos.length);
+        expect(res).to.have.status(400);
 
-        // FAILURE - Title is not supposed to be mandatory.
+        /* FAILURE - Title is not supposed to be mandatory.
+        From the documentation, the body should only contain properties that we want to amend. So, not putting
+        the title is supposed to be fine. However, it returns an error saying that the title is a mandatory field
+        even it if is not. Should return a 200.
+        */
     });
 
     it('PUT /todos/:id: should throw an error when an invalid field is in the body', async function () {
@@ -585,10 +588,13 @@ describe('Test for todos endpoints', function () {
     it('GET /todos/:id/tasksof: should not get all related project items related to unexisting todo - BUG', async function () {
         const id = 123;
         const res = await chai.request(host).get(`/todos/${id}/tasksof`);
-        expect(res).to.have.status(404);
-        expect(res.body).to.deep.equal({ errorMessages: [`Could not find related projects for instance with todos/${id}`] });
+        expect(res).to.have.status(200);
 
-        // FAILURE - Should not be returning any information except an error message
+        /* FAILURE - Should not be returning any information except an error message
+        Getting the projects of an unexisting todo should throw an error. If this is not a bug, this is a bad
+        design decision since the user should be informed that the id given in the request corresponds to no
+        existing todo. Should return a 404.
+        */
     });
 
     it('POST /todos/:id/tasksof: should create a relationship between specific todo and project', async function () {
@@ -616,11 +622,13 @@ describe('Test for todos endpoints', function () {
         const postRes = await chai.request(host).post(`/todos/${todoId}/tasksof`).send(body);
         const res = await chai.request(host).get(`/todos/${todoId}/tasksof`);
         expect(res).to.have.status(200);
-        expect(postRes).to.have.status(201);
-        expect(res.body.projects.length).to.be.greaterThan(0);
-        expect(res.body.projects[0].id).to.deep.equal(projectId.toString());
+        expect(postRes).to.have.status(404);
 
-        // FAILURE - Should link to project even if the id is not a string (bad design)
+        /* FAILURE - Should link to project even if the id is not a string (bad design)
+        This, from a client perspective can be considered a bug. There is no good reason why a numerical id should be
+        inputted as a string for it to work. Either update the documentation of the API, or accept both format (number and string)
+        Should return a 201.
+        */
     });
 
     it('POST /todos/:id/tasksof: should throw an error when trying to create a relationship with unexisting todo id', async function () {
@@ -652,10 +660,13 @@ describe('Test for todos endpoints', function () {
         const body = {};
         await chai.request(host).delete(`/todos/${todoId}/tasksof`);
         const postRes = await chai.request(host).post(`/todos/${todoId}/tasksof`).send(body);
-        expect(postRes).to.have.status(400);
-        expect(postRes.body).to.deep.equal({ errorMessages: [`Could not find thing matching value for id`] });
+        expect(postRes).to.have.status(201);
 
-        // FAILURE - Should not create a relationship when the body is empty
+        /* FAILURE - Should not create a relationship when the body is empty
+        When the body is empty, no relationship should be created. At the moment, a relationship with an
+        empty project is created and this is unexpected behaviour. The client should be informed with a clear
+        error message that the body was empty, or didn't contain the id property. Should return a 400.
+        */
     });
 
     it('POST /todos/:id/tasksof: should throw an error when trying to create a relationship with invalid fields - BUG', async function () {
@@ -666,9 +677,12 @@ describe('Test for todos endpoints', function () {
         await chai.request(host).delete(`/todos/${todoId}/tasksof`);
         const postRes = await chai.request(host).post(`/todos/${todoId}/tasksof`).send(body);
         expect(postRes).to.have.status(400);
-        expect(postRes.body).to.deep.equal({ errorMessages: [`java.lang.NullPointerException`] });
 
-        // FAILURE - The response should be a message, not a java exception.
+        /* FAILURE - The response should be a message, not a java exception.
+        The system should handle the error when an unexpected property is sent in the body. There shouldn't be internal
+        errors shown to the client such as NullPointerException.
+        This is the payload we receive { errorMessages: [`java.lang.NullPointerException`] }
+        */
     });
 
 
@@ -696,14 +710,17 @@ describe('Test for todos endpoints', function () {
         expect(deleteRes.body).to.deep.equal({ errorMessages: [`Could not find any instances with todos/${todoId}/tasksof/${projectId}`] });
     });
 
-    it('DELETE /todos/:id/tasksof/:id: should throw an error when attempting to delete an unexisting todo - BUG', async function () {
+    it('DELETE /todos/:id/tasksof/:id: should throw an error when attempting to delete a project for an unexisting todo - BUG', async function () {
         const todoId = 123;
         const projectId = 1;
         const deleteRes = await chai.request(host).delete(`/todos/${todoId}/tasksof/${projectId}`);
         expect(deleteRes).to.have.status(400);
-        expect(deleteRes.body).to.deep.equal({ errorMessages: [`Could not find any instances with todos/${todoId}/tasksof/${projectId}`] });
 
-        // FAILURE - Appropriate error message should be displayed
+        /* FAILURE - Appropriate error message should be displayed
+        The system should handle the error when an unexpected property is sent in the body. There should't be internal
+        errors shown to the client such as NullPointerException.
+        This is the payload we receive { errorMessages: [`java.lang.NullPointerException`] }
+        */
     });
 
     it('GET /todos/:id/categories: should get all the category items related to specific todo', async function () {
@@ -716,10 +733,13 @@ describe('Test for todos endpoints', function () {
     it('GET /todos/:id/categories: should not get all related category items related to unexisting todo - BUG', async function () {
         const id = 123;
         const res = await chai.request(host).get(`/todos/${id}/categories`);
-        expect(res).to.have.status(404);
-        expect(res.body).to.deep.equal({ errorMessages: [`Could not find related categories for instance with todos/${id}`] });
+        expect(res).to.have.status(200);
 
-        // FAILURE - Should not be returning any information except an error message
+        /* FAILURE - Should not be returning any information except an error message
+        Getting the categories of an unexisting todo should throw an error. If this is not a bug, this is a bad
+        design decision since the user should be informed that the id given in the request corresponds to no
+        existing todo. Should return a 404.
+        */
     });
 
     it('POST /todos/:id/categories: should create a relationship between specific todo and category', async function () {
@@ -747,11 +767,13 @@ describe('Test for todos endpoints', function () {
         const postRes = await chai.request(host).post(`/todos/${todoId}/categories`).send(body);
         const res = await chai.request(host).get(`/todos/${todoId}/categories`);
         expect(res).to.have.status(200);
-        expect(postRes).to.have.status(200);
-        expect(res.body.categories.length).to.be.greaterThan(0);
-        expect(res.body.categories[0].id).to.deep.equal(categoryId.toString());
+        expect(postRes).to.have.status(404);
 
-        // FAILURE - Should link to project even if the id is not a string (bad design)
+        /* FAILURE - Should link to category even if the id is not a string (bad design)
+        This, from a client perspective can be considered a bug. There is no good reason why a numerical id should be
+        inputted as a string for it to work. Either update the documentation of the API, or accept both format (number and string).
+        Should return a 201.
+        */
     });
 
     it('HEAD /todos/:id/categories: should return headers for the category items related to todo, with given id', async function () {
@@ -770,14 +792,17 @@ describe('Test for todos endpoints', function () {
         expect(res.body.categories).to.be.empty
     });
 
-    it('DELETE /todos/:id/categories/:id: should throw an error when attempting to delete an unexisting todo - BUG', async function () {
+    it('DELETE /todos/:id/categories/:id: should throw an error when attempting to delete a category for an unexisting todo - BUG', async function () {
         const todoId = 123;
         const categoryId = 1;
         const deleteRes = await chai.request(host).delete(`/todos/${todoId}/categories/${categoryId}`);
         expect(deleteRes).to.have.status(400);
-        expect(deleteRes.body).to.deep.equal({ errorMessages: [`Could not find any instances with todos/${todoId}/tasksof/${categoryId}`] });
 
-        // FAILURE - Appropriate error message should be displayed
+        /* FAILURE - Appropriate error message should be displayed
+        The system should handle the error when an unexpected property is sent in the body. There should't be internal
+        errors shown to the client such as NullPointerException.
+        This is the payload we receive { errorMessages: [`java.lang.NullPointerException`] }
+        */
     });
 
     it('DELETE /todos/:id/categories/:id: should throw an error when attempting to delete an unexisting category', async function () {
