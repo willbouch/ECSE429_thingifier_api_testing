@@ -15,7 +15,7 @@ describe('Test for todos endpoints', function () {
                 id: '1',
                 title: 'scan paperwork',
                 doneStatus: false,
-                description: '',
+                description: 'x',
                 tasksof: [
                     {
                         id: '1'
@@ -60,8 +60,32 @@ describe('Test for todos endpoints', function () {
         expect(res.body.todos.length).to.equal(defaultTodosObject.todos.length);
     });
 
+    it('GET /todos: should get todo with coressponding id filter', async function () {
+        const res = await chai.request(host).get('/todos?id=1');
+        expect(res).to.have.status(200);
+        expect(res.body.todos.length).to.equal(1);
+    });
+
+    it('GET /todos: should get no todos when filtering with unexisting id', async function () {
+        const res = await chai.request(host).get('/todos?id=whatever');
+        expect(res).to.have.status(200);
+        expect(res.body.todos.length).to.equal(0);
+    });
+
     it('GET /todos: should get all todos with filter on the title', async function () {
         const res = await chai.request(host).get('/todos?title=scan+paperwork');
+        expect(res).to.have.status(200);
+        expect(res.body.todos.length).to.equal(1);
+    });
+
+    it('GET /todos: should get no todos when filtering with unexisting title', async function () {
+        const res = await chai.request(host).get('/todos?title=unexisting+title');
+        expect(res).to.have.status(200);
+        expect(res.body.todos.length).to.equal(0);
+    });
+
+    it('GET /todos: should get all todos with filter on the description', async function () {
+        const res = await chai.request(host).get('/todos?description=x');
         expect(res).to.have.status(200);
         expect(res.body.todos.length).to.equal(1);
     });
@@ -76,6 +100,24 @@ describe('Test for todos endpoints', function () {
         const res = await chai.request(host).get('/todos?doneStatus=false');
         expect(res).to.have.status(200);
         expect(res.body.todos.length).to.equal(defaultTodosObject.todos.length);
+    });
+
+    it('GET /todos: should get all todos with filter on the description & title', async function () {
+        const res = await chai.request(host).get('/todos?description=x&title=scan+paperwork');
+        expect(res).to.have.status(200);
+        expect(res.body.todos.length).to.equal(1);
+    });
+
+    it('GET /todos: should get no todos with a filter on title and description that no todo contains', async function () {
+        const res = await chai.request(host).get('/todos?description=x&title=print+paperwork');
+        expect(res).to.have.status(200);
+        expect(res.body.todos.length).to.equal(0);
+    });
+
+    it('GET /todos: should get all todos with a filter on an invalid field', async function () {
+        const res = await chai.request(host).get('/todos?x=x');
+        expect(res).to.have.status(200);
+        expect(res.body.todos.length).to.equal(2);
     });
 
     it('POST /todos: should create a valid todo with all information', async function () {
@@ -174,11 +216,31 @@ describe('Test for todos endpoints', function () {
     it('POST /todos: should throw error when creating todo with non boolean for doneStatus', async function () {
         const body = {
             title: 'Some title',
-            doneStatus: 'true'
+            doneStatus: 'string'
         };
         const res = await chai.request(host).post('/todos').send(body);
         expect(res).to.have.status(400);
         expect(res.body).to.deep.equal({ errorMessages: ['Failed Validation: doneStatus should be BOOLEAN'] });
+    });
+
+    it('POST /todos: should throw error when creating todo with id field populated', async function () {
+        const body = {
+            title: 'Some title',
+            id:"1"
+        };
+        const res = await chai.request(host).post('/todos').send(body);
+        expect(res).to.have.status(400);
+        expect(res.body).to.deep.equal({ errorMessages: ['Invalid Creation: Failed Validation: Not allowed to create with id'] });
+    });
+
+    it('POST /todos: should throw error when creating todo with unknown field', async function () {
+        const body = {
+            title: 'Some title',
+            random:"random field"
+        };
+        const res = await chai.request(host).post('/todos').send(body);
+        expect(res).to.have.status(400);
+        expect(res.body).to.deep.equal({ errorMessages: ['Could not find field: random'] });
     });
 
     it('HEAD /todos: should return headers for all the instances of todo', async function () {
@@ -205,6 +267,18 @@ describe('Test for todos endpoints', function () {
         expect(res).to.have.status(404);
         expect(res.body).to.deep.equal({ errorMessages: [`Could not find an instance with todos/${id}`] });
     });
+
+
+    it('POST /todos/:id: should throw error when attempting to modify unexisting todo id', async function () {
+        const body = {
+            title: 'Some title - Changed',
+        };
+        const id = 5;
+        const res = await chai.request(host).post(`/todos/${id}`).send(body);
+        expect(res).to.have.status(404);
+        expect(res.body).to.deep.equal({ errorMessages: ['No such todo entity instance with GUID or ID 5 found'] });
+    });
+
 
     it('POST /todos/:id: should change the title property of a specific todo', async function () {
         const body = {
@@ -316,6 +390,31 @@ describe('Test for todos endpoints', function () {
         expect((await chai.request(host).get('/todos')).body.todos.length).equal(defaultTodosObject.todos.length);
     });
 
+    it('POST /todos/:id: should change no properties of a specific todo for an empty body', async function () {
+        const body = {
+        };
+        const id = 1;
+        const res = await chai.request(host).post(`/todos/${id}`).send(body);
+        expect(res).to.have.status(200);
+        expect({
+            ...res.body,
+            doneStatus: !!res.body.doneStatus
+        }).to.deep.equal({
+            ...defaultTodosObject.todos.find(e => e.id == id),
+        });
+        expect((await chai.request(host).get('/todos')).body.todos.length).equal(defaultTodosObject.todos.length);
+    });
+
+    it('POST /todos/:id: should throw an error when an invalid field is in the body', async function () {
+        const body = {
+            invalid:"1"
+        };
+        const id = 1;
+        const res = await chai.request(host).post(`/todos/${id}`).send(body);
+        expect(res).to.have.status(400);
+        expect(res.body).to.deep.equal({ errorMessages: ['Could not find field: invalid'] });
+    });
+
     it('PUT /todos/:id: should change the title property of a specific todo - BUG', async function () {
         const body = {
             title: 'Some title - Changed',
@@ -332,7 +431,7 @@ describe('Test for todos endpoints', function () {
         });
         expect((await chai.request(host).get('/todos')).body.todos.length).equal(defaultTodosObject.todos.length);
 
-        // FAILURE - Resets content of the entire todo
+        // FAILURE - Resets content of the entire todo //fort bon find ca
     });
 
     it('PUT /todos/:id: should change the description property of a specific todo - BUG', async function () {
@@ -350,7 +449,7 @@ describe('Test for todos endpoints', function () {
         });
         expect((await chai.request(host).get('/todos')).body.todos.length).equal(defaultTodosObject.todos.length);
 
-        // FAILURE - Title is not suppose to be mandatory
+        // FAILURE - Title is not supposed to be mandatory
     });
 
     it('PUT /todos/:id: should change the description property of a specific todo in XML format - BUG', async function () {
@@ -370,7 +469,7 @@ describe('Test for todos endpoints', function () {
         });
         expect((await chai.request(host).get('/todos')).body.todos.length).equal(defaultTodosObject.todos.length);
 
-        // FAILURE - Title is not suppose to be mandatory
+        // FAILURE - Title is not supposed to be mandatory
     });
 
     it('PUT /todos/:id: should change all properties of a specific todo', async function () {
@@ -392,6 +491,43 @@ describe('Test for todos endpoints', function () {
             description: body.description,
         });
         expect((await chai.request(host).get('/todos')).body.todos.length).equal(defaultTodosObject.todos.length);
+    });
+
+    it('PUT /todos/:id: should throw error when attempting to modify unexisting todo id', async function () {
+        const body = {
+            title: 'Some title - Changed',
+        };
+        const id = 5;
+        const res = await chai.request(host).put(`/todos/${id}`).send(body);
+        expect(res).to.have.status(404);
+        expect(res.body).to.deep.equal({ errorMessages: ['No such todo entity instance with GUID or ID 5 found'] });
+    });
+
+    it('PUT /todos/:id: should change no properties of a specific todo for an empty body - BUG', async function () {
+        const body = {
+        };
+        const id = 1;
+        const res = await chai.request(host).put(`/todos/${id}`).send(body);
+        expect(res).to.have.status(200);
+        expect({
+            ...res.body,
+            doneStatus: !!res.body.doneStatus
+        }).to.deep.equal({
+            ...defaultTodosObject.todos.find(e => e.id == id),
+        });
+        expect((await chai.request(host).get('/todos')).body.todos.length).equal(defaultTodosObject.todos.length);
+
+        // FAILURE - Title is not supposed to be mandatory.
+    });
+
+    it('PUT /todos/:id: should throw an error when an invalid field is in the body', async function () {
+        const body = {
+            invalid:"1"
+        };
+        const id = 1;
+        const res = await chai.request(host).put(`/todos/${id}`).send(body);
+        expect(res).to.have.status(400);
+        expect(res.body).to.deep.equal({ errorMessages: ['Could not find field: invalid'] });
     });
 
     it('DELETE /todos/:id: should delete specific todo', async function () {
@@ -463,6 +599,58 @@ describe('Test for todos endpoints', function () {
         // FAILURE - Should link to project even if the id is not a string (bad design)
     });
 
+    it('POST /todos/:id/tasksof: should throw an error when trying to create a relationship with unexsting todo id', async function () {
+        const todoId = 123;
+        const projectId = 1;
+        const body = {
+            id: projectId.toString()
+        };
+        await chai.request(host).delete(`/todos/${todoId}/tasksof`);
+        const postRes = await chai.request(host).post(`/todos/${todoId}/tasksof`).send(body);
+        expect(postRes).to.have.status(400);
+        expect(postRes.body).to.deep.equal({ errorMessages: [`Could not find parent thing for relationship todos/${todoId}/tasksof`] });
+    });
+
+    it('POST /todos/:id/tasksof: should throw an error when trying to create a relationship with unexsting project id', async function () {
+        const todoId = 1;
+        const projectId = 123;
+        const body = {
+            id: projectId.toString()
+        };
+        await chai.request(host).delete(`/todos/${todoId}/tasksof`);
+        const postRes = await chai.request(host).post(`/todos/${todoId}/tasksof`).send(body);
+        expect(postRes).to.have.status(400);
+        expect(postRes.body).to.deep.equal({ errorMessages: [`Could not find thing matching value for id`] });
+    });
+
+    // lui je sais pas comment le tester, mais dans le fond quand tu mets un empty body ca marche pareil
+    it('POST /todos/:id/tasksof: should throw an error when trying to create a relationship with unexsting project id - BUG', async function () {
+        const todoId = 1;
+        const body = {};
+        await chai.request(host).delete(`/todos/${todoId}/tasksof`);
+        const postRes = await chai.request(host).post(`/todos/${todoId}/tasksof`).send(body);
+        // ici ca retourne 201 mais on voudrait expect un 400, on garde tu le 201???
+        expect(postRes).to.have.status(201);
+        // pis ca c sur ca va fail mais jsp cquon devrait mettre
+        expect(postRes.body).to.deep.equal({ errorMessages: [`Could not find thing matching value for id`] });
+
+        // FAILURE - Should not create a relationship when the body is empty
+    });
+
+    it('POST /todos/:id/tasksof: should throw an error when trying to create a relationship with invalid fields - BUG', async function () {
+        const todoId = 1;
+        const body = {
+            x: "x"
+        };
+        await chai.request(host).delete(`/todos/${todoId}/tasksof`);
+        const postRes = await chai.request(host).post(`/todos/${todoId}/tasksof`).send(body);
+        expect(postRes).to.have.status(400);
+        expect(postRes.body).to.deep.equal({ errorMessages: [`java.lang.NullPointerException`] });
+
+        // FAILURE - The response should be a message, not a java exception.
+    });
+
+
     it('HEAD /todos/:id/tasksof: should return headers for the project items related to todo, with given id', async function () {
         const res = await chai.request(host).head('/todos/1/tasksof');
         expect(res).to.have.status(200);
@@ -477,6 +665,22 @@ describe('Test for todos endpoints', function () {
         expect(res).to.have.status(200);
         expect(deleteRes).to.have.status(200);
         expect(res.body.projects).to.be.empty
+    });
+
+    it('DELETE /todos/:id/tasksof/:id: should throw an error when attempting to delete an unexisting project', async function () {
+        const todoId = 1;
+        const projectId = 123;
+        const deleteRes = await chai.request(host).delete(`/todos/${todoId}/tasksof/${projectId}`);
+        expect(deleteRes).to.have.status(404);
+        expect(deleteRes.body).to.deep.equal({ errorMessages: [`Could not find any instances with todos/${todoId}/tasksof/${projectId}`] });
+    });
+
+    it('DELETE /todos/:id/tasksof/:id: should throw an error when attempting to delete an unexisting todo', async function () {
+        const todoId = 123;
+        const projectId = 1;
+        const deleteRes = await chai.request(host).delete(`/todos/${todoId}/tasksof/${projectId}`);
+        expect(deleteRes).to.have.status(404);
+        expect(deleteRes.body).to.deep.equal({ errorMessages: [`Could not find any instances with todos/${todoId}/tasksof/${projectId}`] });
     });
 
     it('GET /todos/:id/categories: should get all the category items related to specific todo', async function () {
@@ -542,4 +746,21 @@ describe('Test for todos endpoints', function () {
         expect(deleteRes).to.have.status(200);
         expect(res.body.categories).to.be.empty
     });
+
+    it('DELETE /todos/:id/categories/:id: should throw an error when attempting to delete an unexisting todo', async function () {
+        const todoId = 123;
+        const categoryId = 1;
+        const deleteRes = await chai.request(host).delete(`/todos/${todoId}/categories/${categoryId}`);
+        expect(deleteRes).to.have.status(404);
+        expect(deleteRes.body).to.deep.equal({ errorMessages: [`Could not find any instances with todos/${todoId}/tasksof/${categoryId}`] });
+    });
+
+    it('DELETE /todos/:id/categories/:id: should throw an error when attempting to delete an unexisting category', async function () {
+        const todoId = 1;
+        const categoryId = 123;
+        const deleteRes = await chai.request(host).delete(`/todos/${todoId}/categories/${categoryId}`);
+        expect(deleteRes).to.have.status(404);
+        expect(deleteRes.body).to.deep.equal({ errorMessages: [`Could not find any instances with todos/${todoId}/tasksof/${categoryId}`] });
+    });
+    
 });
