@@ -11,6 +11,7 @@
   "devDependencies": {
     "chai": "*",
     "mocha": "*",
-    "chai-http": "*"
+    "chai-http": "*",
+    "child_process": "*"
   }
 }
