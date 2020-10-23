@@ -4,7 +4,10 @@
   "description": "thingifier api testing",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha test/categories.test.js",
+    "test:categories": "mocha test/categories.test.js",
+    "test:todos": "mocha test/todos.test.js",
+    "test:projects": "mocha test/projects.test.js"
   },
   "author": "WB, EC, LB, KM",
   "license": "ISC",
