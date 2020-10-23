@@ -4,7 +4,7 @@
   "description": "thingifier api testing",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test/categories.test.js",
+    "test": "mocha",
     "test:categories": "mocha test/categories.test.js",
     "test:todos": "mocha test/todos.test.js",
     "test:projects": "mocha test/projects.test.js"
