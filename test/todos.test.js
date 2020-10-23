@@ -641,7 +641,7 @@ describe('Test for todos endpoints', function () {
         expect(postRes).to.have.status(400);
 
         /* FAILURE - The response should be a message, not a java exception.
-        The system should handle the error when an unexpected property is sent in the body. There should't be internal
+        The system should handle the error when an unexpected property is sent in the body. There shouldn't be internal
         errors shown to the client such as NullPointerException.
         */
     });
