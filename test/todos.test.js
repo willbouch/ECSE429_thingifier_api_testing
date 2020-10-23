@@ -42,16 +42,32 @@ describe('Test for todos endpoints', function () {
     };
 
     beforeEach(async function () {
-        server = child_process.spawn(
+        child_process.spawn(
             'java',
             ['-jar', 'runTodoManagerRestAPI-1.5.5.jar'],
         );
-        await new Promise(resolve => setTimeout(resolve, 300));
+
+        let serverReady = false;
+        while (!serverReady) {
+            try {
+                await chai.request(host).get('/todos');
+                serverReady = true;
+            } catch (err) { }
+        }
     });
 
     afterEach(async function () {
-        server.kill();
-        await new Promise(resolve => setTimeout(resolve, 300));
+        try {
+            await chai.request(host).get('/shutdown');
+        } catch (err) { }
+        let serverDown = false;
+        while (!serverDown) {
+            try {
+                await chai.request(host).get('/todos');
+            } catch (err) {
+                serverDown = true;
+            }
+        }
     });
 
     it('GET /todos: should get all todos', async function () {
