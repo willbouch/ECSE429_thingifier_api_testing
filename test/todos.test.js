@@ -433,7 +433,7 @@ describe('Test for todos endpoints', function () {
         });
         expect((await chai.request(host).get('/todos')).body.todos.length).equal(defaultTodosObject.todos.length);
 
-        // FAILURE - Resets content of the entire todo //fort bon find ca
+        // FAILURE - Resets content of the entire todo
     });
 
     it('PUT /todos/:id: should change the description property of a specific todo - BUG', async function () {
