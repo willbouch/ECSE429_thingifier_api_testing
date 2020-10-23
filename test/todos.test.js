@@ -8,7 +8,6 @@ chai.use(chaiHttp);
 
 describe('Test for todos endpoints', function () {
     const host = 'http://localhost:4567';
-    let server;
 
     const defaultTodosObject = {
         todos: [
