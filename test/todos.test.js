@@ -2,7 +2,6 @@ const { expect } = require('chai');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const child_process = require('child_process');
-const exec = require('child_process').exec;
 
 chai.use(chaiHttp);
 
@@ -73,22 +72,17 @@ describe('Test for todos endpoints', function () {
     /*
     * The following two tests are curl requests tests. We do two simple requests to show that the API can correctly respond to such requests.
     */
-
     it('GET /todos: should get all todos when making the request with cURL', async function () {
-        const command = "curl -i -X GET \
-        http://localhost:4567/todos"
-        child = exec(command, function(error, stdout, stderr){
-            expect(stdout.toString()).to.include('200 OK');
-        });
+        const curlResult = child_process.execSync('curl -i -X GET http://localhost:4567/todos').toString('utf8');
+        res = JSON.parse(curlResult.substr(curlResult.indexOf('{'), curlResult.length));
+        expect(curlResult).to.deep.contain('200 OK');
+        expect(res.todos.length).to.deep.equal(defaultTodosObject.todos.length);
     });
 
     it('DELETE /todos/:id: should delete specific todo when making the request with cURL', async function () {
-        const command = "curl -i -X DELETE \
-        http://localhost:4567/todos/2"
-
-        child = exec(command, function(error, stdout, stderr){
-            expect(stdout.toString()).to.include('200 OK');
-        });
+        const curlResult = child_process.execSync('curl -i -X DELETE http://localhost:4567/todos/1').toString('utf8');
+        expect(curlResult).to.deep.contain('200 OK');
+        expect((await chai.request(host).get('/todos')).body.todos.length).to.deep.equal(defaultTodosObject.todos.length - 1);
     });
 
     it('GET /todos: should get all todos', async function () {

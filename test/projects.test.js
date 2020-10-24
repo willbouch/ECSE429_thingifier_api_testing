@@ -54,8 +54,23 @@ describe('Test for projects endpoints', function () {
         }
     });
 
+    /*
+    * The following two tests are curl requests tests. We do two simple requests to show that the API can correctly respond to such requests.
+    */
+    it('GET /projects: should get all projects when making the request with cURL', async function () {
+        const curlResult = child_process.execSync('curl -i -X GET http://localhost:4567/projects').toString('utf8');
+        res = JSON.parse(curlResult.substr(curlResult.indexOf('{'), curlResult.length));
+        expect(curlResult).to.deep.contain('200 OK');
+        expect(res.projects.length).to.deep.equal(defaultProjectsObject.projects.length);
+    });
+
+    it('DELETE /projects/:id: should delete specific project when making the request with cURL', async function () {
+        const curlResult = child_process.execSync('curl -i -X DELETE http://localhost:4567/projects/1').toString('utf8');
+        expect(curlResult).to.deep.contain('200 OK');
+        expect((await chai.request(host).get('/projects')).body.projects.length).to.deep.equal(defaultProjectsObject.projects.length - 1);
+    });
+
     it('GET /projects: should get all projects', async function () {
-        const id = 1;
         const res = await chai.request(host).get('/projects');
         expect(res).to.have.status(200);
         expect({
@@ -310,7 +325,7 @@ describe('Test for projects endpoints', function () {
         const id = 1;
         const res = await chai.request(host).put(`/projects/${id}`).send(body);
         expect(res).to.have.status(200);
-        
+
         /* FAILURE - Resets content of the entire project
         Comparing the body of the response to the initial data will flag that all tasks were removed.
         This is unexpected behaviour since not documented in the API.
@@ -380,7 +395,7 @@ describe('Test for projects endpoints', function () {
         };
         const postRes = await chai.request(host).post(`/projects/${projectId}/categories`).send(body);
         expect(postRes).to.have.status(404);
-        
+
         /* FAILURE - Should link to category even if the id is not a string (bad design)
         This, from a client perspective can be considered a bug. There is no good reason why a numerical id should be
         inputted as a string for it to work. Either update the documentation of the API, or accept both format (number and string)
