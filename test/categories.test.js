@@ -35,6 +35,7 @@ describe('Test for categories endpoints', function () {
                 await chai.request(host).get('/todos');
                 serverReady = true;
             } catch (err) { }
+            await new Promise(resolve => setTimeout(resolve, 50));
         }
     });
 
@@ -49,6 +50,7 @@ describe('Test for categories endpoints', function () {
             } catch (err) {
                 serverDown = true;
             }
+            await new Promise(resolve => setTimeout(resolve, 50));
         }
     });
 

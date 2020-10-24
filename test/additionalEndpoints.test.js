@@ -19,6 +19,7 @@ describe('Test for additional endpoints (some undocumented)', function () {
                 await chai.request(host).get('/todos');
                 serverReady = true;
             } catch (err) { }
+            await new Promise(resolve => setTimeout(resolve, 50));
         }
     });
 
@@ -33,6 +34,7 @@ describe('Test for additional endpoints (some undocumented)', function () {
             } catch (err) {
                 serverDown = true;
             }
+            await new Promise(resolve => setTimeout(resolve, 50));
         }
     });
 
