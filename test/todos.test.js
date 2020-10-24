@@ -46,12 +46,12 @@ describe('Test for todos endpoints', function () {
             'java',
             ['-jar', 'runTodoManagerRestAPI-1.5.5.jar'],
         );
-        await new Promise(resolve => setTimeout(resolve, 300));
+        await new Promise(resolve => setTimeout(resolve, 1000));
     });
 
     afterEach(async function () {
         server.kill();
-        await new Promise(resolve => setTimeout(resolve, 300));
+        await new Promise(resolve => setTimeout(resolve, 1000));
     });
 
     it('GET /todos: should get all todos', async function () {

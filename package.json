@@ -4,7 +4,8 @@
   "description": "thingifier api testing",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "test:projects": "mocha --timeout 5000 test/projects.test.js"
   },
   "author": "WB, EC, LB, KM",
   "license": "ISC",

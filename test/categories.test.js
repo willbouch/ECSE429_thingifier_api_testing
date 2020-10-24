@@ -29,12 +29,12 @@ describe('Test for categories endpoints', function () {
             'java',
             ['-jar', 'runTodoManagerRestAPI-1.5.5.jar'],
         );
-        await new Promise(resolve => setTimeout(resolve, 300));
+        await new Promise(resolve => setTimeout(resolve, 1000));
     });
 
     afterEach(async function () {
         server.kill();
-        await new Promise(resolve => setTimeout(resolve, 300));
+        await new Promise(resolve => setTimeout(resolve,1000));
     });
 
     it('GET /categories: should get all categories', async function () {
@@ -230,7 +230,7 @@ describe('Test for categories endpoints', function () {
         // FAILURE - Resets content of the entire category
     });
 
-    it('PUT /categories/:id: should change the title property of a specific category - BUG', async function () {
+    it('PUT /categories/:id: should change the description property of a specific category - BUG', async function () {
         const body = {
             description: 'Some description - Changed',
         };
@@ -239,7 +239,7 @@ describe('Test for categories endpoints', function () {
         expect(res).to.have.status(200);
         expect(res.body).to.deep.equal({
             ...defaultCategoriesObject.categories.find(e => e.id == id),
-            title: body.title
+            description: body.description
         });
         expect((await chai.request(host).get('/categories')).body.categories.length).equal(defaultCategoriesObject.categories.length);
 
@@ -397,7 +397,7 @@ describe('Test for categories endpoints', function () {
         expect(res.body.todos[0].id).to.deep.equal(todoId.toString());
     });
 
-    it('POST /todos/:id/categories: should create a relationship between specific category and todo if id given as number - BUG', async function () {
+    it('POST /categories/:id/todos: should create a relationship between specific category and todo if id given as number - BUG', async function () {
         const todoId = 1;
         const categoryId = 1;
         const body = {
