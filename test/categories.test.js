@@ -131,9 +131,9 @@ describe('Test for categories endpoints', function () {
 
     it('POST /categories: should create a valid category with only title in XML format', async function () {
         const body = `
-            <todo>
+            <category>
                 <title>Some title</title>
-            </todo>
+            </category>
         `;
         const res = await chai.request(host).post('/categories').set('content-type', 'application/xml').send(body);
         expect(res).to.have.status(201);
@@ -263,7 +263,7 @@ describe('Test for categories endpoints', function () {
         */
     });
 
-    it('PUT /categories/:id: should change the title property of a specific category - BUG', async function () {
+    it('PUT /categories/:id: should change the description property of a specific category - BUG', async function () {
         const body = {
             description: 'Some description - Changed',
         };
@@ -366,7 +366,7 @@ describe('Test for categories endpoints', function () {
         expect(res.body.projects[0].id).to.deep.equal(projectId.toString());
     });
 
-    it('POST /categories/:id/projects: should create a relationship between specific category and project if id given as number - BUG', async function () {
+    it.only('POST /categories/:id/projects: should create a relationship between specific category and project if id given as number - BUG', async function () {
         const categoryId = 1;
         const projectId = 1;
         const body = {
@@ -374,15 +374,12 @@ describe('Test for categories endpoints', function () {
         };
         const postRes = await chai.request(host).post(`/categories/${categoryId}/projects`).send(body);
         const res = await chai.request(host).get(`/categories/${categoryId}/projects`);
-        expect(res).to.have.status(200);
-        expect(postRes).to.have.status(200);
-        expect(res.body.projects.length).to.be.greaterThan(0);
-        expect(res.body.projects[0].id).to.deep.equal(projectId.toString());
-
-        /* FAILURE - Should not be returning any information except an error message
-        Getting the projects of an unexisting category should throw an error. If this is not a bug, this is a bad
-        design decision since the user should be informed that the id given in the request corresponds to no
-        existing todo. Should return a 404.
+        expect(res).to.have.status(404);
+        
+        /* FAILURE - Should link to project even if the id is not a string (bad design)
+        This, from a client perspective can be considered a bug. There is no good reason why a numerical id should be
+        inputted as a string for it to work. Either update the documentation of the API, or accept both format (number and string)
+        Should return a 201.
         */
     });
 
@@ -438,7 +435,7 @@ describe('Test for categories endpoints', function () {
         expect(res.body.todos[0].id).to.deep.equal(todoId.toString());
     });
 
-    it('POST /todos/:id/categories: should create a relationship between specific category and todo if id given as number - BUG', async function () {
+    it('POST /categories/:id/todos: should create a relationship between specific category and todo if id given as number - BUG', async function () {
         const todoId = 1;
         const categoryId = 1;
         const body = {
