@@ -11,54 +11,22 @@ describe('Test for projects endpoints', function() {
     const defaultProjectsObject = {
         projects: [
             {
-                id: "1",
-                title: "Office Work",
-                completed: "false",
-                active: "false",
-                description: "",
+                id: '1',
+                title: 'Office Work',
+                completed: 'false',
+                active: 'false',
+                description: '',
                 tasks: [
                     {
-                        id: "1"
+                        id: '1'
                     },
                     {
-                        id: "2"
+                        id: '2'
                     }
                 ]
             }
         ]
     }
-
-    const defaultTodosObject = {
-        todos: [
-            {
-                id: '1',
-                title: 'scan paperwork',
-                doneStatus: false,
-                description: '',
-                tasksof: [
-                    {
-                        id: '1'
-                    }
-                ],
-                categories: [
-                    {
-                        id: '1'
-                    }
-                ]
-            },
-            {
-                id: '2',
-                title: 'file paperwork',
-                doneStatus: false,
-                description: '',
-                tasksof: [
-                    {
-                        id: '1'
-                    }
-                ]
-            }
-        ]
-    };
 
     beforeEach(async function () {
         child_process.spawn(
@@ -86,7 +54,7 @@ describe('Test for projects endpoints', function() {
             }
         }
     });
-    //passes, sometimes fails
+    
     it('GET /projects: should get all projects', async function () {
         const id = 1;
         const res = await chai.request(host).get('/projects');
@@ -99,13 +67,13 @@ describe('Test for projects endpoints', function() {
         expect(res.body.projects[0]).to.deep.include(idsort);
         expect(res.body.projects.length).to.equal(defaultProjectsObject.projects.length);
     });
-    //passes
+
     it('HEAD /projects: should return headers for all the instances of projects', async function () {
         const res = await chai.request(host).head('/projects');
         expect(res).to.have.status(200);
         expect(res.header).to.not.be.empty
     });
-    //passes
+
     it('POST /projects: should create project without a ID using the field values in the body of the message', async function () {
         const body = {
             title: 'Some title',
@@ -117,7 +85,6 @@ describe('Test for projects endpoints', function() {
         expect((await chai.request(host).get('/projects')).body.projects.length).equal(defaultProjectsObject.projects.length + 1);
     });
 
-    //passes, sometimes fails
     it('GET /projects/:id: should get project with specific id', async function () {
         const id = 1;
         const res = await chai.request(host).get(`/projects/${id}`);
@@ -129,13 +96,13 @@ describe('Test for projects endpoints', function() {
         }
         expect(res.body.projects[0]).to.deep.include(idsort);
     });
-    //passes
+
     it('HEAD /projects/:id: should return headers for a specific instances of project using a id', async function () {
         const res = await chai.request(host).head('/projects/1');
         expect(res).to.have.status(200);
         expect(res.header).to.not.be.empty
     });
-    //passes
+
     it('POST /projects/:id: should change the title property of a specific project', async function () {
         const body = {
             title: 'Some title - Changed',
@@ -149,7 +116,7 @@ describe('Test for projects endpoints', function() {
         });
         expect((await chai.request(host).get('/projects')).body.projects.length).equal(defaultProjectsObject.projects.length);
     });
-    //passes only somtimes, dont know how to fix
+
     it('POST /projects/:id: should change the description property of a specific project', async function () {
         const body = {
             description: 'Some description - Changed',
@@ -164,7 +131,7 @@ describe('Test for projects endpoints', function() {
         });
         expect((await chai.request(host).get('/projects')).body.projects.length).equal(defaultProjectsObject.projects.length);
     });
-    //passes
+
     it('POST /projects/:id: should change all properties of a specific project', async function () {
         const body = {
             title: 'Some title - Changed',
@@ -180,7 +147,7 @@ describe('Test for projects endpoints', function() {
         });
         expect((await chai.request(host).get('/projects')).body.projects.length).equal(defaultProjectsObject.projects.length);
     });
-    //FAIL bug, description does not update without title, also assrtion error
+
     it('PUT /projects/:id: should change the title property of a specific project - BUG', async function () {
         const body = {
             title: 'Some title - Changed',
@@ -196,7 +163,7 @@ describe('Test for projects endpoints', function() {
         });
         expect((await chai.request(host).get('/projects')).body.projects.length).equal(defaultProjectsObject.projects.length);
     });
-    //Title gets overwritten to nothing, assertion error
+
     it('PUT /projects/:id: should change the description property of a specific project - BUG', async function () {
         const body = {
             description: 'Some description - Changed',
@@ -210,8 +177,8 @@ describe('Test for projects endpoints', function() {
         });
         expect((await chai.request(host).get('/projects')).body.projects.length).equal(defaultProjectsObject.projects.length);
     });
-    //assertion error
-    it.only('PUT /projects/:id: should change all properties of a specific project - BUG', async function () {
+
+    it('PUT /projects/:id: should change all properties of a specific project - BUG', async function () {
         const body = {
             title: 'Some title - Changed',
             description: 'Some description - Changed',
@@ -226,14 +193,14 @@ describe('Test for projects endpoints', function() {
         });
         expect((await chai.request(host).get('/projects')).body.projects.length).equal(defaultProjectsObject.projects.length);
     });
-    //passes
+
     it('DELETE /projects/:id: should delete specific project', async function () {
         const id = 1;
         const res = await chai.request(host).delete(`/projects/${id}`);
         expect(res).to.have.status(200);
         expect((await chai.request(host).get('/projects')).body.projects.length).equal(defaultProjectsObject.projects.length - 1);
     });
-    //passes
+
     it('DELETE /projects/:id: should not delete specific project if unexisting id', async function () {
         const id = 10;
         const res = await chai.request(host).delete(`/projects/${id}`);
@@ -242,7 +209,6 @@ describe('Test for projects endpoints', function() {
         expect((await chai.request(host).get('/projects')).body.projects.length).equal(defaultProjectsObject.projects.length);
     });
 
-    //Double check tests after this point
     it('GET /projects/:id/categories: should return all the category items related to project, with given id', async function () {
         const id = 1;
         await chai.request(host).post(`/projects/${id}/categories`).send({ id: '1' });
@@ -250,13 +216,13 @@ describe('Test for projects endpoints', function() {
         expect(res).to.have.status(200);
         expect(res.body.categories.length).to.be.greaterThan(0);
     });
-    //passes
+
     it('HEAD /projects/:id/categories: should return headers for the category items related to project, with given id', async function () {
         const res = await chai.request(host).head('/projects/1/categories');
         expect(res).to.have.status(200);
         expect(res.header).to.not.be.empty
     });
-    //passes
+
     it('POST /projects/:id/categories: create an instance of a relationship named categories between project instance - BUG', async function () {
         const projectId = 1;
         const categoryId = 1;
@@ -270,7 +236,7 @@ describe('Test for projects endpoints', function() {
         expect(postRes).to.have.status(201);
         expect(res.body.categories.length).to.be.greaterThan(0);
     });
-    //passes
+
     it('DELETE /projects/:id/categories/:id: should delete the relationship between project and category', async function () {
         const projectId = 1;
         const categoryId = 1;
@@ -282,20 +248,20 @@ describe('Test for projects endpoints', function() {
         expect(deleteRes).to.have.status(200);
         expect(res.body.categories).to.be.empty
     });
-    // passes 
+
     it('GET /projects/:id/tasks: should return all the todo items related to project', async function () {
         const id = 1;
         const res = await chai.request(host).get(`/projects/${id}/tasks`);
         expect(res).to.have.status(200);
         expect((await chai.request(host).get('/projects/1/tasks')).body.todos.length).equal(2);
     });
-    //passes
+
     it('HEAD /projects/:id/tasks: headers for the todo items related to project, with given id, by the relationship named tasks', async function () {
         const res = await chai.request(host).head('/projects/1/tasks');
         expect(res).to.have.status(200);
         expect(res.header).to.not.be.empty
     });
-    //fail gives taskId 2 
+
     it('POST /projects/:id/tasks: should create a relationship named tasks between project instance - BUG', async function () {
         const taskId = 1;
         const projectId = 1;
@@ -307,10 +273,10 @@ describe('Test for projects endpoints', function() {
         const res = await chai.request(host).get(`/projects/${projectId}/tasks`);
         expect(res).to.have.status(200);
         expect(postRes).to.have.status(201);
-        // expect(res.body.todos[0].id).to.deep.equal("2");
+        // expect(res.body.todos[0].id).to.deep.equal('2');
         expect(res.body.todos[0].id).to.deep.equal(taskId.toString());
     });
-    //passes
+
     it('DELETE /projects/:id/tasks/:id: should delete the instance of the relationship named tasks between project and todo using the :id', async function () {
         const taskId = 1;
         const projectId = 1;
@@ -320,5 +286,4 @@ describe('Test for projects endpoints', function() {
         expect(deleteRes).to.have.status(200);
         expect((await chai.request(host).get('/projects/1/tasks')).body.todos.length).equal(1);
     });
-
 });
