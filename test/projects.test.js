@@ -40,6 +40,7 @@ describe('Test for projects endpoints', function () {
             } catch (err) { }
         }
     });
+
     afterEach(async function () {
         try {
             await chai.request(host).get('/shutdown');
