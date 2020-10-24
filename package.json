@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "test:categories": "mocha test/categories.test.js",
-    "test:todos": "mocha test/todos.test.js",
-    "test:projects": "mocha test/projects.test.js"
+    "test:categories": "mocha --timeout 10000 test/categories.test.js",
+    "test:todos": "mocha --timeout 10000 test/todos.test.js",
+    "test:projects": "mocha --timeout 10000 test/projects.test.js"
   },
   "author": "WB, EC, LB, KM",
   "license": "ISC",
