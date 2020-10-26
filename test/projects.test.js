@@ -446,7 +446,7 @@ describe('Test for projects endpoints', function () {
         */
     });
 
-    it('POST /projects/:id/tasks: should create a relationship named tasks between project instance - BUG', async function () {
+    it('POST /projects/:id/tasks: should create a relationship named tasks between project instance', async function () {
         const taskId = 1;
         const projectId = 1;
         const body = {
