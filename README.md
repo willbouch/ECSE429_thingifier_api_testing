@@ -8,3 +8,7 @@
 ### Running the test suite
 1. Run ``` npm i ``` to install the dependencies
 2. Run ``` npm run test ```
+
+### Parsing and executing Gherkin scripts with Cucumber
+1. Run ``` npm i ``` to install the dependencies
+2. Run ``` npm run cucumber ```
