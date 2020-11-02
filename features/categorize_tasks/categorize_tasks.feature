@@ -18,3 +18,15 @@ Feature: THING-001: Categorize tasks with priority
             | 'HIGH Priority'   | 'most important'   |
             | 'MEDIUM Priority' | 'medium important' |
             | 'LOW Priority'    | 'least important'  |
+
+    Scenario: As a student, I cannot categorize a task with an unexisting category
+        Given the system is running on localhost and is clean
+        And task with title 'ECSE429 Part B' is created
+        When student creates an instance of relationship between tasks and unexisting category
+        Then the system should send 'Could not find thing matching value for id' as error message
+
+    Scenario: As a student, I cannot categorize a unexisting task
+        Given the system is running on localhost and is clean
+        And category with title 'HIGH Priority' is created
+        When student creates an instance of relationship for unexisting task
+        Then the system should send 'Could not find parent thing for relationship' as error message

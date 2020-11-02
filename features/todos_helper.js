@@ -18,7 +18,8 @@ const createTodos = async todos => {
 };
 
 const categorizeTodo = async (todoId, category) => {
-    await chai.request(host).post(`/todos/${todoId}/categories`).send(category);
+    const res = await chai.request(host).post(`/todos/${todoId}/categories`).send(category);
+    return res.body;
 };
 
 const categorizeTodos = async (todoIds, category) => {
