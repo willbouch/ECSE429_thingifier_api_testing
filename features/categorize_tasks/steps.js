@@ -1,56 +1,79 @@
 const { Given, When, Then } = require('cucumber');
-const { convertToObjects } = require('../helper');
+const { convertToObjects, getIdsOnly } = require('../helper');
 const {
     createTodo,
     createTodos,
     categorizeTodo,
     categorizeTodos,
-    getTodo
+    getTodo,
+    getTodos,
 } = require('../todos_helper');
-const { createCategory } = require('../categories_helper');
+const { createCategory, getCategoriesFromTitle } = require('../categories_helper');
 const { expect } = require('chai');
 
 const unexistingId = 123456789;
 
-let createdTodo;
-let createdTodos;
-let createdCategory;
 let resBody;
 
 Given('tasks with the following details are created:', async function (rawTasks) {
     const todos = convertToObjects(rawTasks);
-    createdTodos = await createTodos(todos);
+    await createTodos(todos);
 });
 
-Given('category with title {string} and description {string}', async function (categoryTitle, categoryDescription) {
-    createdCategory = await createCategory({ title: categoryTitle, description: categoryDescription });
+Given('category with title {string} and description {string} is created', async function (categoryTitle, categoryDescription) {
+    await createCategory({ title: categoryTitle, description: categoryDescription });
 });
 
-When('student creates an instance of relationship between tasks and priority category', async function () {
-    await categorizeTodos(createdTodos, { id: createdCategory.toString() });
+Given('category with title {string} is created', async function (categoryTitle) {
+    await createCategory({ title: categoryTitle });
 });
 
-Then('the corresponding task should be categorized as {string}', async function (categoryTitle) {
-    const todo = await getTodo(createdTodos[0]);
-    expect(todo.categories[0].id).to.equal(createdCategory);
+Given('existing task is already categorized as {string}', async function (categoryTitle) {
+    const category = (await getCategoriesFromTitle(categoryTitle))[0];
+    const todos = await getTodos();
+    await categorizeTodo(todos[0].id, { id: category.id.toString() });
 });
 
-Given('task with title {string} is created', async function (taskTitle) {
-    createdTodo = await createTodo({ title: taskTitle });
+// ---
+
+When('student categorizes existing tasks with priority {string}', async function (categoryTitle) {
+    const category = (await getCategoriesFromTitle(categoryTitle))[0];
+    const todos = await getTodos();
+    const todoIds = getIdsOnly(todos);
+    await categorizeTodos(todoIds, { id: category.id.toString() });
 });
 
-When('student creates an instance of relationship between tasks and unexisting category', async function () {
-    resBody = await categorizeTodo(createdTodo, { id: unexistingId.toString() });
+When('student categorizes existing task with priority {string}', async function (categoryTitle) {
+    const category = (await getCategoriesFromTitle(categoryTitle))[0];
+    const todos = await getTodos();
+    await categorizeTodo(todos[0].id, category.id.toString())
+});
+
+When('student creates an instance of relationship between a task and unexisting category', async function () {
+    const todos = await getTodos();
+    resBody = await categorizeTodo(todos[0].id, { id: unexistingId.toString() });
+});
+
+When('student creates an instance of relationship for unexisting task', async function () {
+    resBody = await categorizeTodo(unexistingId, {});
+});
+
+// ---
+
+Then('the corresponding tasks should be categorized with priority {string}', async function (categoryTitle) {
+    const category = (await getCategoriesFromTitle(categoryTitle))[0];
+    const todos = await getTodos();
+    todos.forEach(todo => {
+        expect(todo.categories[0].id).to.equal(category.id);
+    });
+});
+
+Then('the corresponding task should be categorized with priority {string}', async function (categoryTitle) {
+    const category = (await getCategoriesFromTitle(categoryTitle))[0];
+    const todos = await getTodos();
+    expect(todos[0].categories[0].id).to.equal(category.id);
 });
 
 Then('the system should send {string} as error message', async function (error) {
     expect(resBody.errorMessages[0]).to.contain(error);
-});
-
-Given('category with title {string} is created', async function (categoryTitle) {
-    createdCategory = await createCategory({ title: categoryTitle });
-});
-
-When('student creates an instance of relationship for unexisting task', async function () {
-    resBody = await categorizeTodo(unexistingId, { id: createdCategory.toString() });
 });

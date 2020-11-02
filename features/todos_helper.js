@@ -33,6 +33,11 @@ const getTodo = async todoId => {
     return res.body.todos[0];
 };
 
+const getTodos = async () => {
+    const res = await chai.request(host).get(`/todos`);
+    return res.body.todos;
+};
+
 const updateTodo = async (todoId, updates) => {
     await chai.request(host).post(`/todos/${todoId}`).send(updates);
 };
@@ -43,5 +48,6 @@ module.exports = {
     categorizeTodo: categorizeTodo,
     categorizeTodos: categorizeTodos,
     getTodo: getTodo,
+    getTodos: getTodos,
     updateTodo: updateTodo
 };
