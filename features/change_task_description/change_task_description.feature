@@ -19,3 +19,5 @@ Feature: THING-010: Change task description
     Scenario: As a student, I cannot change description of unexisting task (error flow)
         When student changes description of a unexisting task with description 'new task description'
         Then the system should send 'No such todo entity instance with GUID or ID' as error message
+
+    # MISSING alternate flow

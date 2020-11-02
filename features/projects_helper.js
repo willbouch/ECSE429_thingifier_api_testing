@@ -1,0 +1,29 @@
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+chai.use(chaiHttp);
+const host = 'http://localhost:4567';
+
+const createProject = async project => {
+    const res = await chai.request(host).post('/projects').send(project);
+    return res.body.id;
+};
+
+const createProjects = async projects => {
+    const ids = [];
+    for (const project of projects) {
+        const id = await createProject(project);
+        ids.push(id);
+    }
+    return ids;
+};
+
+const getProjects = async () => {
+    const res = await chai.request(host).get(`/projects`);
+    return res.body.projects;
+};
+
+module.exports = {
+    createProject: createProject,
+    createProjects: createProjects,
+    getProjects: getProjects
+};

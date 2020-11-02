@@ -8,12 +8,22 @@ const {
     categorizeTodo,
     categorizeTodos,
     getTodos,
-    getTodosFromTitle
+    getTodosFromTitle,
+    addTodoToProject,
+    getTodo,
+    uncategorizeTodos
 } = require('./todos_helper');
 const {
     createCategory,
-    getCategoriesFromTitle
+    getCategoriesFromTitle,
+    createCategories,
+    getCategories
 } = require('./categories_helper');
+const {
+    createProject,
+    createProjects,
+    getProjects
+} = require('./projects_helper');
 
 const { expect } = require('chai');
 
@@ -65,6 +75,18 @@ Given('task with title {string} already has doneStatus {string}', async function
     });
 });
 
+Given('projects with the following details are created:', async function (rawProjects) {
+    const projects = convertToObjects(rawProjects);
+    await createProjects(projects);
+});
+
+Given('previously created tasks are categorized as {string}', async function (categoryTitle) {
+    const category = (await getCategoriesFromTitle(categoryTitle))[0];
+    const todos = await getTodos();
+    const todoIds = getIdsOnly(todos);
+    await categorizeTodos(todoIds, { id: category.id.toString() })
+});
+
 // WHEN
 
 When('student categorizes existing tasks with priority {string}', async function (categoryTitle) {
@@ -104,7 +126,30 @@ When('student marks task with title {string} as done', async function (taskTitle
 });
 
 When('student marks a unexisting task as done', async function () {
-    await updateTodo(unexistingId, { doneStatus: true });
+    resBody = await updateTodo(unexistingId, { doneStatus: true });
+});
+
+When('student adds task with title {string} to class todo list', async function (taskTitle) {
+    const todo = (await getTodosFromTitle(taskTitle))[0];
+    const project = (await getProjects())[0];
+    await addTodoToProject(todo.id, { id: project.id })
+});
+
+When('student adds unexisting task to class todo list', async function () {
+    const project = (await getProjects())[0];
+    resBody = await addTodoToProject(unexistingId, { id: project.id.toString() })
+});
+
+When('student removes previous categorization with priority {string}', async function (categoryTitle) {
+    const category = (await getCategoriesFromTitle(categoryTitle))[0];
+    const todos = await getTodos();
+    const todoIds = getIdsOnly(todos);
+    await uncategorizeTodos(todoIds, category.id);
+});
+
+When('student adjusts priority of unexisting task', async function () {
+    const category = (await getCategories())[0];
+    resBody = await categorizeTodo(unexistingId, { id: category.id.toString() })
 });
 
 // THEN
@@ -139,4 +184,16 @@ Then('task with title {string} will be marked as done', async function (taskTitl
 Then('task with title {string} should still be marked as done', async function (taskTitle) {
     const todo = (await getTodosFromTitle(taskTitle))[0];
     expect(todo.doneStatus).to.equal('true');
+});
+
+Then('class todo list should have task with title {string}', async function (taskTitle) {
+    const project = (await getProjects())[0];
+    const todo = await getTodo(project.tasks[0].id);
+    expect(todo.title).to.equal(taskTitle);
+});
+
+Then('the corresponding tasks should no longer be categorized with priority {string}', async function (categoryTitle) {
+    const category = (await getCategoriesFromTitle(categoryTitle))[0];
+    const todos = await getTodos();
+    expect(todos[0].categories).to.not.contain(category.id)
 });

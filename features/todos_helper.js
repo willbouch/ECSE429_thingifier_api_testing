@@ -28,6 +28,21 @@ const categorizeTodos = async (todoIds, category) => {
     }
 };
 
+const uncategorizeTodo = async (todoId, categoryId) => {
+    await chai.request(host).delete(`/todos/${todoId}/categories/${categoryId}`);
+};
+
+const uncategorizeTodos = async (todoIds, categoryId) => {
+    for (const todoId of todoIds) {
+        await uncategorizeTodo(todoId, categoryId);
+    }
+};
+
+const addTodoToProject = async (todoId, project) => {
+    const res = await chai.request(host).post(`/todos/${todoId}/tasksof`).send(project);
+    return res.body;
+};
+
 const getTodo = async todoId => {
     const res = await chai.request(host).get(`/todos/${todoId}`);
     return res.body.todos[0];
@@ -64,5 +79,8 @@ module.exports = {
     getTodos: getTodos,
     updateTodo: updateTodo,
     getTodosFromTitle: getTodosFromTitle,
-    updateTodos: updateTodos
+    updateTodos: updateTodos,
+    addTodoToProject: addTodoToProject,
+    uncategorizeTodos: uncategorizeTodos,
+    uncategorizeTodo: uncategorizeTodo
 };

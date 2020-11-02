@@ -8,6 +8,20 @@ const createCategory = async category => {
     return res.body.id;
 };
 
+const createCategories = async categories => {
+    const ids = [];
+    for (const category of categories) {
+        const id = await createCategory(category);
+        ids.push(id);
+    }
+    return ids;
+};
+
+const getCategories = async () => {
+    const res = await chai.request(host).get(`/categories`);
+    return res.body.categories;
+};
+
 const getCategoriesFromTitle = async title => {
     formattedTitle = title.replace(' ', '+')
     const res = await chai.request(host).get(`/categories?title=${title}`);
@@ -16,5 +30,7 @@ const getCategoriesFromTitle = async title => {
 
 module.exports = {
     createCategory: createCategory,
-    getCategoriesFromTitle: getCategoriesFromTitle
+    getCategoriesFromTitle: getCategoriesFromTitle,
+    createCategories: createCategories,
+    getCategories: getCategories
 };
