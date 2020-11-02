@@ -6,10 +6,10 @@ Feature: THING-001: Categorize tasks with priority
     Background:
         Given the system is running on localhost and is clean
         Given tasks with the following details are created:
-            | title             | doneStatus | description                  | id | 
-            | ECSE429 Part B    | false      | Write gherkin scripts        | 1  |
-            | COMP551 Project 2 | false      | Implement softmax regression | 2  |
-            | Climbing          | false      | Go climbing                  | 3  |
+            | title             | doneStatus | description                  |
+            | ECSE429 Part B    | false      | Write gherkin scripts        |
+            | COMP551 Project 2 | false      | Implement softmax regression |
+            | Climbing          | false      | Go climbing                  |
 
     Scenario Outline: As a student, I can categorize tasks with priority (normal flow)
         Given category with title <cat_title> and description <cat_description> is created
@@ -30,15 +30,15 @@ Feature: THING-001: Categorize tasks with priority
         When student creates an instance of relationship for unexisting task
         Then the system should send 'Could not find parent thing for relationship' as error message
 
-    # Scenario Outline: As a student, I can recategorize a task that is already categorized (alternative flow)
-    #     Given category with title <old_cat_title> is created
-    #     And existing task is already categorized as <old_cat_title>
-    #     And category with title <new_cat_title> is created
-    #     When student categorizes existing task with priority <new_cat_title>
-    #     Then the corresponding task should be categorized with priority <new_cat_title>
-    #     And should no longer be categorized with priority <old_cat_title>
-    #     Examples:
-    #         | old_cat_title     | new_cat_title     |
-    #         | 'HIGH Priority'   | 'MEDIUM Priority' |
-    #         | 'MEDIUM Priority' | 'LOW Priority'    |
-    #         | 'LOW Priority'    | 'HIGH Priority'   |
+# Scenario Outline: As a student, I can recategorize a task that is already categorized (alternative flow)
+#     Given category with title <old_cat_title> is created
+#     And existing task is already categorized as <old_cat_title>
+#     And category with title <new_cat_title> is created
+#     When student categorizes existing task with priority <new_cat_title>
+#     Then the corresponding task should be categorized with priority <new_cat_title>
+#     And should no longer be categorized with priority <old_cat_title>
+#     Examples:
+#         | old_cat_title     | new_cat_title     |
+#         | 'HIGH Priority'   | 'MEDIUM Priority' |
+#         | 'MEDIUM Priority' | 'LOW Priority'    |
+#         | 'LOW Priority'    | 'HIGH Priority'   |

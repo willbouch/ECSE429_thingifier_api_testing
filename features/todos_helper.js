@@ -39,7 +39,20 @@ const getTodos = async () => {
 };
 
 const updateTodo = async (todoId, updates) => {
-    await chai.request(host).post(`/todos/${todoId}`).send(updates);
+    const res = await chai.request(host).post(`/todos/${todoId}`).send(updates);
+    return res.body;
+};
+
+const updateTodos = async (todoIds, updates) => {
+    for (const todoId of todoIds) {
+        await updateTodo(todoId, updates);
+    }
+};
+
+const getTodosFromTitle = async title => {
+    formattedTitle = title.replace(' ', '+')
+    const res = await chai.request(host).get(`/todos?title=${title}`);
+    return res.body.todos;
 };
 
 module.exports = {
@@ -49,5 +62,7 @@ module.exports = {
     categorizeTodos: categorizeTodos,
     getTodo: getTodo,
     getTodos: getTodos,
-    updateTodo: updateTodo
+    updateTodo: updateTodo,
+    getTodosFromTitle: getTodosFromTitle,
+    updateTodos: updateTodos
 };
