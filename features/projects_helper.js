@@ -22,8 +22,15 @@ const getProjects = async () => {
     return res.body.projects;
 };
 
+const getProjectsFromTitle = async title => {
+    formattedTitle = title.replace(' ', '+')
+    const res = await chai.request(host).get(`/projects?title=${title}`);
+    return res.body.projects;
+};
+
 module.exports = {
     createProject: createProject,
     createProjects: createProjects,
-    getProjects: getProjects
+    getProjects: getProjects,
+    getProjectsFromTitle: getProjectsFromTitle
 };

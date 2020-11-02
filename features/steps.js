@@ -11,7 +11,9 @@ const {
     getTodosFromTitle,
     addTodoToProject,
     getTodo,
-    uncategorizeTodos
+    uncategorizeTodos,
+    addTodosToProject,
+    removeTodoFromProject
 } = require('./todos_helper');
 const {
     createCategory,
@@ -22,7 +24,8 @@ const {
 const {
     createProject,
     createProjects,
-    getProjects
+    getProjects,
+    getProjectsFromTitle,
 } = require('./projects_helper');
 
 const { expect } = require('chai');
@@ -85,6 +88,13 @@ Given('previously created tasks are categorized as {string}', async function (ca
     const todos = await getTodos();
     const todoIds = getIdsOnly(todos);
     await categorizeTodos(todoIds, { id: category.id.toString() })
+});
+
+Given('previously created tasks are added to class todo list {string}', async function (projectTitle) {
+    const todos = await getTodos();
+    const todoIds = getIdsOnly(todos);
+    const project = (await getProjectsFromTitle(projectTitle))[0];
+    await addTodosToProject(todoIds, { id: project.id.toString() })
 });
 
 // WHEN
@@ -152,6 +162,17 @@ When('student adjusts priority of unexisting task', async function () {
     resBody = await categorizeTodo(unexistingId, { id: category.id.toString() })
 });
 
+When('student removes task with title {string} from class {string}', async function (taskTitle, projectTitle) {
+    const todo = (await getTodosFromTitle(taskTitle))[0];
+    const project = (await getProjectsFromTitle(projectTitle))[0];
+    await removeTodoFromProject(todo.id, project.id);
+});
+
+When('student removes unexisting task to class todo list', async function () {
+    const project = (await getProjects())[0];
+    resBody = await removeTodoFromProject(unexistingId, { id: project.id.toString() })
+});
+
 // THEN
 
 Then('the corresponding tasks should be categorized with priority {string}', async function (categoryTitle) {
@@ -179,6 +200,7 @@ Then('the corresponding task should have the new description {string}', async fu
 
 Then('task with title {string} will be marked as done', async function (taskTitle) {
     const todo = (await getTodosFromTitle(taskTitle))[0];
+    expect(todo.doneStatus).to.equal('true');
 });
 
 Then('task with title {string} should still be marked as done', async function (taskTitle) {
@@ -196,4 +218,10 @@ Then('the corresponding tasks should no longer be categorized with priority {str
     const category = (await getCategoriesFromTitle(categoryTitle))[0];
     const todos = await getTodos();
     expect(todos[0].categories).to.not.contain(category.id)
+});
+
+Then('class {string} should no longer have task with title {string}', async function (projectTitle, taskTitle) {
+    const todo = (await getTodosFromTitle(taskTitle))[0];
+    const project = (await getProjectsFromTitle(projectTitle))[0];
+    expect(project.tasks).to.not.contain(todo.id);
 });

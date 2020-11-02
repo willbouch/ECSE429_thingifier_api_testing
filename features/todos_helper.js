@@ -43,6 +43,17 @@ const addTodoToProject = async (todoId, project) => {
     return res.body;
 };
 
+const addTodosToProject = async (todoIds, project) => {
+    for (const todoId of todoIds) {
+        await addTodoToProject(todoId, project);
+    }
+};
+
+const removeTodoFromProject = async (todoId, projectId) => {
+    const res = await chai.request(host).delete(`/todos/${todoId}/tasksof/${projectId}`);
+    return res.body;
+};
+
 const getTodo = async todoId => {
     const res = await chai.request(host).get(`/todos/${todoId}`);
     return res.body.todos[0];
@@ -82,5 +93,7 @@ module.exports = {
     updateTodos: updateTodos,
     addTodoToProject: addTodoToProject,
     uncategorizeTodos: uncategorizeTodos,
-    uncategorizeTodo: uncategorizeTodo
+    uncategorizeTodo: uncategorizeTodo,
+    addTodosToProject: addTodosToProject,
+    removeTodoFromProject: removeTodoFromProject
 };

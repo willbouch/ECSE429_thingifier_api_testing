@@ -5,7 +5,7 @@ Feature: THING-001: Categorize tasks with priority
 
     Background:
         Given the system is running on localhost and is clean
-        Given tasks with the following details are created:
+        And tasks with the following details are created:
             | title             | doneStatus | description                  |
             | ECSE429 Part B    | false      | Write gherkin scripts        |
             | COMP551 Project 2 | false      | Implement softmax regression |
