@@ -8,6 +8,13 @@ const createCategory = async category => {
     return res.body.id;
 };
 
+const getCategoriesFromTitle = async title => {
+    formattedTitle = title.replace(' ', '+')
+    const res = await chai.request(host).get(`/categories?title=${title}`);
+    return res.body.categories;
+};
+
 module.exports = {
-    createCategory: createCategory
+    createCategory: createCategory,
+    getCategoriesFromTitle: getCategoriesFromTitle
 };

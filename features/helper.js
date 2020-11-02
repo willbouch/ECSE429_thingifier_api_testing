@@ -50,9 +50,19 @@ const runServer = async () => {
     }
 
     // Otherwise, server is running and clean
-}
+};
+
+const getIdsOnly = array => {
+    const ids = array.reduce((prev, curr) => {
+        const temp = prev;
+        temp.push(curr.id);
+        return temp;
+    }, []);
+    return ids;
+};
 
 module.exports = {
     convertToObjects: convertToObjects,
-    runServer: runServer
+    runServer: runServer,
+    getIdsOnly: getIdsOnly
 };
