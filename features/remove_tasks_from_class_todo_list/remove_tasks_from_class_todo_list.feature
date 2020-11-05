@@ -23,6 +23,15 @@ Feature: THING-004: Remove tasks from a class todo list
             | 'Start part B'                  | 'ECSE429'   |
             | 'Understand cucumber on NodeJs' | 'ECSE429'   |
             | 'Write Gherkin scripts'         | 'ECSE429'   |
+    
+    Scenario Outline: As a student, I can mark a task from a class to do list as done  (alternate flow)
+        When student marks task with title <task_title> as done
+        Then the task with title <task_title> should be marked as done
+        Examples:
+            | task_title                      |
+            | 'Start part B'                  |
+            | 'Understand cucumber on NodeJs' |
+            | 'Write Gherkin scripts'         |
 
     Scenario: As a student, I cannot remove unexisting task to class todo list (error flow)
         When student removes unexisting task to class todo list

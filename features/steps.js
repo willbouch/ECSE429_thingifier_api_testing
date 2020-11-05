@@ -193,7 +193,6 @@ When('student removes unexistent course', async function(){
 	resBody = await deleteProject(unexistingId)
 });
 
-
 // THEN
 
 Then('the corresponding tasks should be categorized with priority {string}', async function (categoryTitle) {
@@ -260,4 +259,9 @@ Then('corresponding course with title {string} should be removed', async functio
 Then('the corresponding course with title {string} should be inactive', async function (projectTitle) {
     const project = (await getProjectsFromTitle(projectTitle))[0];
     expect(project.active).equal('false');
+});
+
+Then('the task with title {string} should be marked as done', async function (taskTitle) {
+    const todo = (await getTodosFromTitle(taskTitle))[0];
+    expect(todo.doneStatus).equal('true');
 });
