@@ -160,6 +160,13 @@ When('student removes previous categorization with priority {string}', async fun
     await uncategorizeTodos(todoIds, category.id);
 });
 
+When('student recategorizes existing tasks with priority {string}', async function (categoryTitle) {
+    const category = (await getCategoriesFromTitle(categoryTitle))[0];
+    const todos = await getTodos();
+    const todoIds = getIdsOnly(todos);
+    await categorizeTodos(todoIds, { id: category.id.toString() });
+});
+
 When('student adjusts priority of unexisting task', async function () {
     const category = (await getCategories())[0];
     resBody = await categorizeTodo(unexistingId, { id: category.id.toString() })
@@ -203,6 +210,14 @@ When('student replaces the existing task with title {string} with a new descript
 // THEN
 
 Then('the corresponding tasks should be categorized with priority {string}', async function (categoryTitle) {
+    const category = (await getCategoriesFromTitle(categoryTitle))[0];
+    const todos = await getTodos();
+    todos.forEach(todo => {
+        expect(todo.categories[0].id).to.equal(category.id);
+    });
+});
+
+Then('the corresponding tasks should still be categorized with priority {string}', async function (categoryTitle) {
     const category = (await getCategoriesFromTitle(categoryTitle))[0];
     const todos = await getTodos();
     todos.forEach(todo => {
@@ -269,7 +284,7 @@ Then('the corresponding course with title {string} should be inactive', async fu
 });
 
 Then('the old task should be removed and a new one with a new description {string} should exist', async function (taskDescription) {
-    const todos =  await getTodos();
+    const todos = await getTodos();
     expect(todos).to.have.lengthOf(1);
     expect(todos[0].description).to.be.equal(taskDescription);
 });

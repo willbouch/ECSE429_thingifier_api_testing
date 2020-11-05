@@ -24,6 +24,10 @@ Feature: THING-009: Adjust the priority of a task
             | 'MEDIUM Priority' | 'HIGH Priority' |
             | 'LOW Priority'    | 'HIGH Priority' |
 
+    Scenario: As a student, I can adjust the priority of a task with the same priority (alternate flow)
+        When student recategorizes existing tasks with priority 'HIGH Priority'
+        Then the corresponding tasks should still be categorized with priority 'HIGH Priority'
+
     Scenario: As a student, I cannot adjust priority of unexisting task (error flow)
         When student adjusts priority of unexisting task
         Then the system should send 'Could not find parent thing for relationship' as error message
