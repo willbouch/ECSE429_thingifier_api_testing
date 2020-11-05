@@ -26,6 +26,8 @@ const {
     createProjects,
     getProjects,
     getProjectsFromTitle,
+    deleteProject,
+    updateProject,
 } = require('./projects_helper');
 
 const { expect } = require('chai');
@@ -78,7 +80,7 @@ Given('task with title {string} already has doneStatus {string}', async function
     });
 });
 
-Given('projects with the following details are created:', async function (rawProjects) {
+Given('courses with the following details are created:', async function (rawProjects) {
     const projects = convertToObjects(rawProjects);
     await createProjects(projects);
 });
@@ -173,6 +175,25 @@ When('student removes unexisting task to class todo list', async function () {
     resBody = await removeTodoFromProject(unexistingId, { id: project.id.toString() })
 });
 
+When('course to do list with title {string} and description {string} is created', async function (projectTitle, projectDescription) {
+    await createProject({ title: projectTitle, description: projectDescription });
+});
+
+When('course with title {string} is removed', async function (projectTitle) {
+    const project = (await getProjectsFromTitle(projectTitle))[0];
+    await deleteProject(project.id);
+});
+
+When('student changes course with title {string} to be inactive', async function(projectTitle) {
+    const project = (await getProjectsFromTitle(projectTitle))[0];
+    await updateProject(project.id, { active: false });
+});
+
+When('student removes unexistent course', async function(){
+	resBody = await deleteProject(unexistingId)
+});
+
+
 // THEN
 
 Then('the corresponding tasks should be categorized with priority {string}', async function (categoryTitle) {
@@ -224,4 +245,19 @@ Then('class {string} should no longer have task with title {string}', async func
     const todo = (await getTodosFromTitle(taskTitle))[0];
     const project = (await getProjectsFromTitle(projectTitle))[0];
     expect(project.tasks).to.not.contain(todo.id);
+});
+
+Then('corresponding course todo list with title {string} should be created', async function (projectTitle) {
+    const project = (await getProjectsFromTitle(projectTitle))[0];
+    expect(project).to.not.be.undefined;
+});
+
+Then('corresponding course with title {string} should be removed', async function (projectTitle) {
+    const project = (await getProjectsFromTitle(projectTitle))[0];
+    expect(project).to.be.undefined;
+});
+
+Then('the corresponding course with title {string} should be inactive', async function (projectTitle) {
+    const project = (await getProjectsFromTitle(projectTitle))[0];
+    expect(project.active).equal('false');
 });
