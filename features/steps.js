@@ -189,7 +189,7 @@ When('student changes course with title {string} to be inactive', async function
     await updateProject(project.id, { active: false });
 });
 
-When('unexistent course is removed', async function(){
+When('student removes unexistent course', async function(){
 	resBody = await deleteProject(unexistingId)
 });
 
@@ -259,10 +259,5 @@ Then('corresponding course with title {string} should be removed', async functio
 
 Then('the corresponding course with title {string} should be inactive', async function (projectTitle) {
     const project = (await getProjectsFromTitle(projectTitle))[0];
-    expect(project.active).to.be.false
-});
-
-Then('the corresponding course with title {string} should be inactive', async function (projectTitle) {
-    const project = (await getProjectsFromTitle(projectTitle))[0];
-    expect(project.active).to.be.false
+    expect(project.active).equal('false');
 });
