@@ -80,7 +80,7 @@ Given('task with title {string} already has doneStatus {string}', async function
     });
 });
 
-Given('projects with the following details are created:', async function (rawProjects) {
+Given('courses with the following details are created:', async function (rawProjects) {
     const projects = convertToObjects(rawProjects);
     await createProjects(projects);
 });
@@ -184,13 +184,13 @@ When('course with title {string} is removed', async function (projectTitle) {
     await deleteProject(project.id);
 });
 
-When('student changes project with title {string} to be inactive', async function(projectTitle) {
+When('student changes course with title {string} to be inactive', async function(projectTitle) {
     const project = (await getProjectsFromTitle(projectTitle))[0];
     await updateProject(project.id, { active: false });
 });
 
 When('unexistent course is removed', async function(){
-	await deleteProject(unexistingId);
+	resBody = await deleteProject(unexistingId)
 });
 
 

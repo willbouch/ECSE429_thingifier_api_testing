@@ -5,7 +5,7 @@ Feature: THING-002: Add a task to a class todo list
 
     Background:
         Given the system is running on localhost and is clean
-        And projects with the following details are created:
+        And courses with the following details are created:
             | title   | completed | active | description         |
             | ECSE429 | false     | true   | Software validation |
 
