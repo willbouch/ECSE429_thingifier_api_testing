@@ -13,7 +13,8 @@ const {
     getTodo,
     uncategorizeTodos,
     addTodosToProject,
-    removeTodoFromProject
+    removeTodoFromProject,
+    deleteTodo
 } = require('./todos_helper');
 const {
     createCategory,
@@ -184,15 +185,20 @@ When('course with title {string} is removed', async function (projectTitle) {
     await deleteProject(project.id);
 });
 
-When('student changes course with title {string} to be inactive', async function(projectTitle) {
+When('student changes course with title {string} to be inactive', async function (projectTitle) {
     const project = (await getProjectsFromTitle(projectTitle))[0];
     await updateProject(project.id, { active: false });
 });
 
-When('student removes unexistent course', async function(){
-	resBody = await deleteProject(unexistingId)
+When('student removes unexistent course', async function () {
+    resBody = await deleteProject(unexistingId)
 });
 
+When('student replaces the existing task with title {string} with a new description {string}', async function (taskTitle, taskDescription) {
+    const todo = (await getTodosFromTitle(taskTitle))[0];
+    await createTodo({ title: taskTitle, description: taskDescription });
+    await deleteTodo(todo.id);
+});
 
 // THEN
 
@@ -260,4 +266,10 @@ Then('corresponding course with title {string} should be removed', async functio
 Then('the corresponding course with title {string} should be inactive', async function (projectTitle) {
     const project = (await getProjectsFromTitle(projectTitle))[0];
     expect(project.active).equal('false');
+});
+
+Then('the old task should be removed and a new one with a new description {string} should exist', async function (taskDescription) {
+    const todos =  await getTodos();
+    expect(todos).to.have.lengthOf(1);
+    expect(todos[0].description).to.be.equal(taskDescription);
 });
