@@ -8,16 +8,12 @@ const {
     updateMultiple,
     createOne,
     createMultiple,
-    deleteOne
+    deleteOne,
+    createOneRelationship,
+    createMultipleRelationships,
+    deleteOneRelationship,
+    deleteMultipleRelationships
 } = require('./api_helper');
-const {
-    categorizeTodo,
-    categorizeTodos,
-    addTodoToProject,
-    uncategorizeTodos,
-    addTodosToProject,
-    removeTodoFromProject,
-} = require('./todos_helper');
 
 const { expect } = require('chai');
 
@@ -72,14 +68,14 @@ Given('previously created tasks are categorized as {string}', async function (ca
     const category = (await getFromTitle('categories', categoryTitle))[0];
     const todos = await getAll('todos');
     const todoIds = getIdsOnly(todos);
-    await categorizeTodos(todoIds, { id: category.id.toString() })
+    await createMultipleRelationships('todos', todoIds, 'categories', { id: category.id.toString() })
 });
 
 Given('previously created tasks are added to class todo list {string}', async function (projectTitle) {
     const todos = await getAll('todos');
     const todoIds = getIdsOnly(todos);
     const project = (await getFromTitle('projects', projectTitle))[0];
-    await addTodosToProject(todoIds, { id: project.id.toString() })
+    await createMultipleRelationships('todos', todoIds, 'tasksof', { id: project.id.toString() })
 });
 
 // WHEN
@@ -88,22 +84,22 @@ When('student categorizes existing tasks with priority {string}', async function
     const category = (await getFromTitle('categories', categoryTitle))[0];
     const todos = await getAll('todos');
     const todoIds = getIdsOnly(todos);
-    await categorizeTodos(todoIds, { id: category.id.toString() });
+    await createMultipleRelationships('todos', todoIds, 'categories', { id: category.id.toString() });
 });
 
 When('student categorizes existing task with priority {string}', async function (categoryTitle) {
     const category = (await getFromTitle('categories', categoryTitle))[0];
     const todos = await getAll('todos');
-    await categorizeTodo(todos[0].id, category.id.toString())
+    await createOneRelationship('todos', todos[0].id, 'categories', category.id.toString())
 });
 
 When('student creates an instance of relationship between a task and unexisting category', async function () {
     const todos = await getAll('todos');
-    resBody = await categorizeTodo(todos[0].id, { id: unexistingId.toString() });
+    resBody = await createOneRelationship('todos', todos[0].id, 'categories', { id: unexistingId.toString() });
 });
 
 When('student creates an instance of relationship for unexisting task', async function () {
-    resBody = await categorizeTodo(unexistingId, {});
+    resBody = await createOneRelationship('todos', unexistingId, 'categories', {});
 });
 
 When('student changes the task description to {string}', async function (newTaskDescription) {
@@ -127,42 +123,42 @@ When('student marks a unexisting task as done', async function () {
 When('student adds task with title {string} to class todo list', async function (taskTitle) {
     const todo = (await getFromTitle('todos', taskTitle))[0];
     const project = (await getAll('projects'))[0];
-    await addTodoToProject(todo.id, { id: project.id })
+    await createOneRelationship('todos', todo.id, 'tasksof', { id: project.id })
 });
 
 When('student adds unexisting task to class todo list', async function () {
     const project = (await getAll('projects'))[0];
-    resBody = await addTodoToProject(unexistingId, { id: project.id.toString() })
+    resBody = await createOneRelationship('todos', unexistingId, 'tasksof', { id: project.id.toString() })
 });
 
 When('student removes previous categorization with priority {string}', async function (categoryTitle) {
     const category = (await getFromTitle('categories', categoryTitle))[0];
     const todos = await getAll('todos');
     const todoIds = getIdsOnly(todos);
-    await uncategorizeTodos(todoIds, category.id);
+    await deleteMultipleRelationships('todos', todoIds, 'categories', category.id);
 });
 
 When('student recategorizes existing tasks with priority {string}', async function (categoryTitle) {
     const category = (await getFromTitle('categories', categoryTitle))[0];
     const todos = await getAll('todos');
     const todoIds = getIdsOnly(todos);
-    await categorizeTodos(todoIds, { id: category.id.toString() });
+    await createMultipleRelationships('todos', todoIds, 'categories', { id: category.id.toString() });
 });
 
 When('student adjusts priority of unexisting task', async function () {
     const category = (await getAll('categories'))[0];
-    resBody = await categorizeTodo(unexistingId, { id: category.id.toString() })
+    resBody = await createOneRelationship('todos', unexistingId, 'categories', { id: category.id.toString() })
 });
 
 When('student removes task with title {string} from class {string}', async function (taskTitle, projectTitle) {
     const todo = (await getFromTitle('todos', taskTitle))[0];
     const project = (await getFromTitle('projects', projectTitle))[0];
-    await removeTodoFromProject(todo.id, project.id);
+    await deleteOneRelationship('todos', todo.id, 'tasksof', project.id);
 });
 
 When('student removes unexisting task to class todo list', async function () {
     const project = (await getAll('projects'))[0];
-    resBody = await removeTodoFromProject(unexistingId, { id: project.id.toString() })
+    resBody = await deleteOneRelationship('todos', unexistingId, 'tasksof', { id: project.id.toString() })
 });
 
 When('course to do list with title {string} and description {string} is created', async function (projectTitle, projectDescription) {

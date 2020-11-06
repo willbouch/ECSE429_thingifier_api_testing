@@ -45,6 +45,27 @@ const deleteOne = async (option, id) => {
     return res.body;
 };
 
+const createOneRelationship = async (option1, id, option2, object) => {
+    const res = await chai.request(host).post(`/${option1}/${id}/${option2}`).send(object);
+    return res.body;
+};
+
+const createMultipleRelationships = async (option1, ids, option2, object) => {
+    for (const id of ids) {
+        await createOneRelationship(option1, id, option2, object);
+    }
+};
+
+const deleteOneRelationship = async (option1, id1, option2, id2) => {
+    res = await chai.request(host).delete(`/${option1}/${id1}/${option2}/${id2}`);
+    return res.body;
+};
+
+const deleteMultipleRelationships = async (option1, id1s, option2, id2) => {
+    for (const id of id1s) {
+        await deleteOneRelationship(option1, id, option2, id2);
+    }
+};
 
 module.exports = {
     getFromTitle: getFromTitle,
@@ -54,5 +75,9 @@ module.exports = {
     createMultiple: createMultiple,
     updateOne: updateOne,
     updateMultiple: updateMultiple,
-    deleteOne: deleteOne
+    deleteOne: deleteOne,
+    createOneRelationship: createOneRelationship,
+    createMultipleRelationships: createMultipleRelationships,
+    deleteOneRelationship: deleteOneRelationship,
+    deleteMultipleRelationships: deleteMultipleRelationships,
 };
