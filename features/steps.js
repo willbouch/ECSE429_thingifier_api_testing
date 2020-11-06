@@ -9,6 +9,7 @@ const {
     categorizeTodos,
     getTodos,
     getTodosFromTitle,
+    getTodosFromCategory,
     addTodoToProject,
     getTodo,
     uncategorizeTodos,
@@ -46,6 +47,11 @@ Given('the system is running on localhost and is clean', async function () {
 Given('tasks with the following details are created:', async function (rawTasks) {
     const todos = convertToObjects(rawTasks);
     await createTodos(todos);
+});
+
+Given('categories with the following details are created:', async function (rawCategories) {
+    const categories = convertToObjects(rawCategories);
+    await createCategories(categories);
 });
 
 Given('category with title {string} and description {string} is created', async function (categoryTitle, categoryDescription) {
@@ -208,6 +214,16 @@ When('student replaces the existing task with title {string} with a new descript
     await deleteTodo(todo.id);
 });
 
+When('course to do list with title {string} and description {string} is created as a category', async function (categoryTitle, categoryDescription) {
+    resBody = await createCategory({ title: categoryTitle, description: categoryDescription });
+});
+
+When('student categorizes task with title {string} to class todo list', async function (taskTitle) {
+    const todo = (await getTodosFromTitle(taskTitle))[0];
+    const category = (await getCategories())[0];
+    await categorizeTodo(todo.id, { id: category.id.toString() });
+});
+
 // THEN
 
 Then('the corresponding tasks should be categorized with priority {string}', async function (categoryTitle) {
@@ -293,5 +309,16 @@ Then('the old task should be removed and a new one with a new description {strin
     const todos = await getTodos();
     expect(todos).to.have.lengthOf(1);
     expect(todos[0].description).to.be.equal(taskDescription);
+});
+
+Then('corresponding course todo list with title {string} should be created with description {string}', async function (categoryTitle, categoryDescription) {
+    const category = (await getCategoriesFromTitle(categoryTitle))[0];
+    expect(category.description).equal(categoryDescription);
+});
+
+Then('the category class todo list should have task with title {string}', async function (taskTitle) {
+    const category = (await getCategories())[0];
+    const todo = (await getTodosFromCategory(category.id))[0];
+    expect(todo.title).equal(taskTitle);
 });
 

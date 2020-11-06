@@ -69,6 +69,11 @@ const getTodos = async () => {
     return res.body.todos;
 };
 
+const getTodosFromCategory = async (categoryId) => {
+    const res = await chai.request(host).get(`/categories/${categoryId}/todos`);
+    return res.body.todos;
+};
+
 const updateTodo = async (todoId, updates) => {
     const res = await chai.request(host).post(`/todos/${todoId}`).send(updates);
     return res.body;
@@ -93,6 +98,7 @@ module.exports = {
     categorizeTodos: categorizeTodos,
     getTodo: getTodo,
     getTodos: getTodos,
+    getTodosFromCategory: getTodosFromCategory,
     updateTodo: updateTodo,
     getTodosFromTitle: getTodosFromTitle,
     updateTodos: updateTodos,
