@@ -3,13 +3,13 @@ const { runServer, convertToObjects, getIdsOnly } = require('./helper');
 const {
     getFromTitle,
     getFromId,
-    getAll
+    getAll,
+    updateOne,
+    updateMultiple
 } = require('./api_helper');
 const {
     createTodo,
     createTodos,
-    updateTodo,
-    updateTodos,
     categorizeTodo,
     categorizeTodos,
     addTodoToProject,
@@ -20,13 +20,11 @@ const {
 } = require('./todos_helper');
 const {
     createCategory,
-    createCategories,
 } = require('./categories_helper');
 const {
     createProject,
     createProjects,
     deleteProject,
-    updateProject,
 } = require('./projects_helper');
 
 const { expect } = require('chai');
@@ -66,7 +64,7 @@ Given('task with title {string} has doneStatus {string}', async function (taskTi
 Given('task with title {string} already has doneStatus {string}', async function (taskTitle, doneStatus) {
     let todos = await getFromTitle('todos', taskTitle);
     const todoIds = getIdsOnly(todos);
-    await updateTodos(todoIds, { doneStatus: true });
+    await updateMultiple('todos', todoIds, { doneStatus: true });
     todos = await getFromTitle('todos', taskTitle);
     todos.forEach(todo => {
         expect(todo.doneStatus).to.equal(doneStatus);
@@ -118,20 +116,20 @@ When('student creates an instance of relationship for unexisting task', async fu
 
 When('student changes the task description to {string}', async function (newTaskDescription) {
     const todos = await getAll('todos');
-    await updateTodo(todos[0].id, { description: newTaskDescription });
+    await updateOne('todos', todos[0].id, { description: newTaskDescription });
 });
 
 When('student changes description of a unexisting task with description {string}', async function (newTaskDescription) {
-    resBody = await updateTodo(unexistingId, { description: newTaskDescription });
+    resBody = await updateOne('todos', unexistingId, { description: newTaskDescription });
 });
 
 When('student marks task with title {string} as done', async function (taskTitle) {
     const todo = (await getFromTitle('todos', taskTitle))[0];
-    await updateTodo(todo.id, { doneStatus: true });
+    await updateOne('todos', todo.id, { doneStatus: true });
 });
 
 When('student marks a unexisting task as done', async function () {
-    resBody = await updateTodo(unexistingId, { doneStatus: true });
+    resBody = await updateOne('todos', unexistingId, { doneStatus: true });
 });
 
 When('student adds task with title {string} to class todo list', async function (taskTitle) {
@@ -186,7 +184,7 @@ When('course with title {string} is removed', async function (projectTitle) {
 
 When('student changes course with title {string} to be inactive', async function (projectTitle) {
     const project = (await getFromTitle('projects', projectTitle))[0];
-    await updateProject(project.id, { active: false });
+    await updateOne('projects', project.id, { active: false });
 });
 
 When('student removes unexistent course', async function () {

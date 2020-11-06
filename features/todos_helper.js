@@ -59,24 +59,12 @@ const removeTodoFromProject = async (todoId, projectId) => {
     return res.body;
 };
 
-const updateTodo = async (todoId, updates) => {
-    const res = await chai.request(host).post(`/todos/${todoId}`).send(updates);
-    return res.body;
-};
-
-const updateTodos = async (todoIds, updates) => {
-    for (const todoId of todoIds) {
-        await updateTodo(todoId, updates);
-    }
-};
 
 module.exports = {
     createTodo: createTodo,
     createTodos: createTodos,
     categorizeTodo: categorizeTodo,
     categorizeTodos: categorizeTodos,
-    updateTodo: updateTodo,
-    updateTodos: updateTodos,
     addTodoToProject: addTodoToProject,
     uncategorizeTodos: uncategorizeTodos,
     uncategorizeTodo: uncategorizeTodo,

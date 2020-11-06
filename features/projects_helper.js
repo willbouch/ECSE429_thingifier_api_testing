@@ -23,14 +23,9 @@ const deleteProject = async (projectId) => {
     return res.body;
 };
 
-const updateProject = async (projectId, updates) => {
-    const res = await chai.request(host).post(`/projects/${projectId}`).send(updates);
-    return res.body;
-};
 
 module.exports = {
     createProject: createProject,
     createProjects: createProjects,
     deleteProject: deleteProject,
-    updateProject: updateProject
 };

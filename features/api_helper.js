@@ -19,8 +19,21 @@ const getAll = async option => {
     return res.body[option];
 };
 
+const updateOne = async (option, id, updates) => {
+    const res = await chai.request(host).post(`/${option}/${id}`).send(updates);
+    return res.body;
+};
+
+const updateMultiple = async (option, ids, updates) => {
+    for (const id of ids) {
+        await updateOne(option, id, updates);
+    }
+};
+
 module.exports = {
     getFromTitle: getFromTitle,
     getFromId:getFromId,
-    getAll: getAll
+    getAll: getAll,
+    updateOne: updateOne,
+    updateMultiple: updateMultiple
 };
