@@ -17,6 +17,11 @@ const createTodos = async todos => {
     return ids;
 };
 
+const deleteTodo = async (todoId) => {
+    const res = await chai.request(host).delete(`/todos/${todoId}`);
+    return res.body;
+};
+
 const categorizeTodo = async (todoId, category) => {
     const res = await chai.request(host).post(`/todos/${todoId}/categories`).send(category);
     return res.body;
@@ -95,5 +100,6 @@ module.exports = {
     uncategorizeTodos: uncategorizeTodos,
     uncategorizeTodo: uncategorizeTodo,
     addTodosToProject: addTodosToProject,
-    removeTodoFromProject: removeTodoFromProject
+    removeTodoFromProject: removeTodoFromProject,
+    deleteTodo: deleteTodo
 };
