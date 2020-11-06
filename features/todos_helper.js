@@ -59,11 +59,6 @@ const removeTodoFromProject = async (todoId, projectId) => {
     return res.body;
 };
 
-const getTodo = async todoId => {
-    const res = await chai.request(host).get(`/todos/${todoId}`);
-    return res.body.todos[0];
-};
-
 const updateTodo = async (todoId, updates) => {
     const res = await chai.request(host).post(`/todos/${todoId}`).send(updates);
     return res.body;
@@ -80,7 +75,6 @@ module.exports = {
     createTodos: createTodos,
     categorizeTodo: categorizeTodo,
     categorizeTodos: categorizeTodos,
-    getTodo: getTodo,
     updateTodo: updateTodo,
     updateTodos: updateTodos,
     addTodoToProject: addTodoToProject,

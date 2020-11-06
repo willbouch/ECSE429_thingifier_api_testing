@@ -9,6 +9,11 @@ const getFromTitle = async (option, title) => {
     return res.body[option];
 };
 
+const getFromId = async (option, id) => {
+    const res = await chai.request(host).get(`/${option}/${id}`);
+    return res.body[option][0];
+};
+
 const getAll = async option => {
     const res = await chai.request(host).get(`/${option}`);
     return res.body[option];
@@ -16,5 +21,6 @@ const getAll = async option => {
 
 module.exports = {
     getFromTitle: getFromTitle,
+    getFromId:getFromId,
     getAll: getAll
 };

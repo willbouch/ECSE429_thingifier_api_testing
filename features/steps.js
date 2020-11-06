@@ -2,6 +2,7 @@ const { Given, When, Then } = require('cucumber');
 const { runServer, convertToObjects, getIdsOnly } = require('./helper');
 const {
     getFromTitle,
+    getFromId,
     getAll
 } = require('./api_helper');
 const {
@@ -12,7 +13,6 @@ const {
     categorizeTodo,
     categorizeTodos,
     addTodoToProject,
-    getTodo,
     uncategorizeTodos,
     addTodosToProject,
     removeTodoFromProject,
@@ -244,7 +244,7 @@ Then('task with title {string} should still be marked as done', async function (
 
 Then('class todo list should have task with title {string}', async function (taskTitle) {
     const project = (await getAll('projects'))[0];
-    const todo = await getTodo(project.tasks[0].id);
+    const todo = await getFromId('todos', project.tasks[0].id);
     expect(todo.title).to.equal(taskTitle);
 });
 
