@@ -3,24 +3,6 @@ const chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 const host = 'http://localhost:4567';
 
-const createTodo = async todo => {
-    const res = await chai.request(host).post('/todos').send(todo);
-    return res.body.id;
-};
-
-const createTodos = async todos => {
-    const ids = [];
-    for (const todo of todos) {
-        const id = await createTodo(todo);
-        ids.push(id);
-    }
-    return ids;
-};
-
-const deleteTodo = async (todoId) => {
-    const res = await chai.request(host).delete(`/todos/${todoId}`);
-    return res.body;
-};
 
 const categorizeTodo = async (todoId, category) => {
     const res = await chai.request(host).post(`/todos/${todoId}/categories`).send(category);
@@ -61,8 +43,6 @@ const removeTodoFromProject = async (todoId, projectId) => {
 
 
 module.exports = {
-    createTodo: createTodo,
-    createTodos: createTodos,
     categorizeTodo: categorizeTodo,
     categorizeTodos: categorizeTodos,
     addTodoToProject: addTodoToProject,
@@ -70,5 +50,4 @@ module.exports = {
     uncategorizeTodo: uncategorizeTodo,
     addTodosToProject: addTodosToProject,
     removeTodoFromProject: removeTodoFromProject,
-    deleteTodo: deleteTodo
 };

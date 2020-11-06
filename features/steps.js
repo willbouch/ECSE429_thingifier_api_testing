@@ -5,27 +5,19 @@ const {
     getFromId,
     getAll,
     updateOne,
-    updateMultiple
+    updateMultiple,
+    createOne,
+    createMultiple,
+    deleteOne
 } = require('./api_helper');
 const {
-    createTodo,
-    createTodos,
     categorizeTodo,
     categorizeTodos,
     addTodoToProject,
     uncategorizeTodos,
     addTodosToProject,
     removeTodoFromProject,
-    deleteTodo
 } = require('./todos_helper');
-const {
-    createCategory,
-} = require('./categories_helper');
-const {
-    createProject,
-    createProjects,
-    deleteProject,
-} = require('./projects_helper');
 
 const { expect } = require('chai');
 
@@ -41,19 +33,19 @@ Given('the system is running on localhost and is clean', async function () {
 
 Given('tasks with the following details are created:', async function (rawTasks) {
     const todos = convertToObjects(rawTasks);
-    await createTodos(todos);
+    await createMultiple('todos', todos);
 });
 
 Given('category with title {string} and description {string} is created', async function (categoryTitle, categoryDescription) {
-    await createCategory({ title: categoryTitle, description: categoryDescription });
+    await createOne('categories', { title: categoryTitle, description: categoryDescription });
 });
 
 Given('category with title {string} is created', async function (categoryTitle) {
-    await createCategory({ title: categoryTitle });
+    await createOne('categories', { title: categoryTitle });
 });
 
 Given('task with title {string} and description {string} is created', async function (taskTitle, taskDescription) {
-    await createTodo({ title: taskTitle, description: taskDescription });
+    await createOne('todos', { title: taskTitle, description: taskDescription });
 });
 
 Given('task with title {string} has doneStatus {string}', async function (taskTitle, doneStatus) {
@@ -73,7 +65,7 @@ Given('task with title {string} already has doneStatus {string}', async function
 
 Given('courses with the following details are created:', async function (rawProjects) {
     const projects = convertToObjects(rawProjects);
-    await createProjects(projects);
+    await createMultiple('projects', projects);
 });
 
 Given('previously created tasks are categorized as {string}', async function (categoryTitle) {
@@ -174,12 +166,12 @@ When('student removes unexisting task to class todo list', async function () {
 });
 
 When('course to do list with title {string} and description {string} is created', async function (projectTitle, projectDescription) {
-    await createProject({ title: projectTitle, description: projectDescription });
+    await createOne('projects', { title: projectTitle, description: projectDescription });
 });
 
 When('course with title {string} is removed', async function (projectTitle) {
     const project = (await getFromTitle('projects', projectTitle))[0];
-    await deleteProject(project.id);
+    await deleteOne('projects', project.id);
 });
 
 When('student changes course with title {string} to be inactive', async function (projectTitle) {
@@ -188,13 +180,13 @@ When('student changes course with title {string} to be inactive', async function
 });
 
 When('student removes unexistent course', async function () {
-    resBody = await deleteProject(unexistingId)
+    resBody = await deleteOne('projects', unexistingId)
 });
 
 When('student replaces the existing task with title {string} with a new description {string}', async function (taskTitle, taskDescription) {
     const todo = (await getFromTitle('todos', taskTitle))[0];
-    await createTodo({ title: taskTitle, description: taskDescription });
-    await deleteTodo(todo.id);
+    await createOne('todos', { title: taskTitle, description: taskDescription });
+    await deleteOne('todos', todo.id);
 });
 
 // THEN
