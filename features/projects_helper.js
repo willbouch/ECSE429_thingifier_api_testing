@@ -17,16 +17,6 @@ const createProjects = async projects => {
     return ids;
 };
 
-const getProjects = async () => {
-    const res = await chai.request(host).get(`/projects`);
-    return res.body.projects;
-};
-
-const getProjectsFromTitle = async title => {
-    formattedTitle = title.replace(' ', '+')
-    const res = await chai.request(host).get(`/projects?title=${title}`);
-    return res.body.projects;
-};
 
 const deleteProject = async (projectId) => {
     const res = await chai.request(host).delete(`/projects/${projectId}`);
@@ -41,8 +31,6 @@ const updateProject = async (projectId, updates) => {
 module.exports = {
     createProject: createProject,
     createProjects: createProjects,
-    getProjects: getProjects,
-    getProjectsFromTitle: getProjectsFromTitle,
     deleteProject: deleteProject,
     updateProject: updateProject
 };

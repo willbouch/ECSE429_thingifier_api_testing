@@ -17,20 +17,8 @@ const createCategories = async categories => {
     return ids;
 };
 
-const getCategories = async () => {
-    const res = await chai.request(host).get(`/categories`);
-    return res.body.categories;
-};
-
-const getCategoriesFromTitle = async title => {
-    formattedTitle = title.replace(' ', '+')
-    const res = await chai.request(host).get(`/categories?title=${title}`);
-    return res.body.categories;
-};
 
 module.exports = {
     createCategory: createCategory,
-    getCategoriesFromTitle: getCategoriesFromTitle,
     createCategories: createCategories,
-    getCategories: getCategories
 };
