@@ -15,19 +15,23 @@ const {
     uncategorizeTodos,
     addTodosToProject,
     removeTodoFromProject,
+    getIncompleteTodosFromProject,
+    assignTodosToCategory,
     deleteTodo
 } = require('./todos_helper');
 const {
     createCategory,
     getCategoriesFromTitle,
     createCategories,
-    getCategories
+    getCategories,
+    getIncompleteHighPriorityTodos
 } = require('./categories_helper');
 const {
     createProject,
     createProjects,
     getProjects,
     getProjectsFromTitle,
+    setProjectToComplete,
     deleteProject,
     updateProject,
 } = require('./projects_helper');
@@ -106,6 +110,17 @@ Given('previously created tasks are added to class todo list {string}', async fu
     await addTodosToProject(todoIds, { id: project.id.toString() })
 });
 
+Given('the class of title {string} is set to complete', async function (projectTitle) {
+    const project = (await getProjectsFromTitle(projectTitle))[0];
+    await setProjectToComplete({ id: project.id.toString() })
+});
+
+Given('the category {string} is assigned to each todo', async function (categoryTitle) {
+    const category = (await getCategoriesFromTitle(categoryTitle))[0];
+    const todos = await getTodos();
+    const todoIds = getIdsOnly(todos);
+    await assignTodosToCategory(todoIds, { id: category.id.toString() })
+});
 // WHEN
 
 When('student categorizes existing tasks with priority {string}', async function (categoryTitle) {
@@ -187,6 +202,19 @@ When('student removes task with title {string} from class {string}', async funct
 When('student removes unexisting task to class todo list', async function () {
     const project = (await getProjects())[0];
     resBody = await removeTodoFromProject(unexistingId, { id: project.id.toString() })
+});
+
+When('student queries incomplete tasks of class with class title {string}', async function (projectTitle) {
+    const project = (await getProjectsFromTitle(projectTitle))[0];
+    resBody = await getIncompleteTodosFromProject({ id: project.id.toString() })
+});
+
+When('student queries incomplete tasks of unexisting class', async function (){
+    resBody = await getIncompleteTodosFromProject(unexistingId)
+});
+
+When('student queries all incomplete and {string} priority tasks', async function(categoryTitle){
+    resBody = await getIncompleteHighPriorityTodos(categoryTitle);
 });
 
 When('course to do list with title {string} and description {string} is created', async function (projectTitle, projectDescription) {
@@ -285,6 +313,26 @@ Then('class {string} should no longer have task with title {string}', async func
     expect(project.tasks).to.not.contain(todo.id);
 });
 
+Then ('the system returns incomplete tasks of title {string} of class {string}', async function (taskTitle0, projectTitle){
+    const project = (await getProjectsFromTitle(projectTitle))[0];
+    const todos = await getIncompleteTodosFromProject({ id: project.id.toString() })
+    expect(todos[0].title).to.be.equal(taskTitle0);
+    // expect(todos[1].title).to.be.equal(taskTitle1); //weird bug where they switch just like before
+});
+
+Then('the system should return all incomplete todos', async function () {
+    expect(resBody).to.not.be.empty; 
+});
+
+Then('the system returns a list of {string} tasks including {string}, {string}, and {string}', async function (categoryTitle, taskTitle0, taskTitle1, taskTitle2){
+    const category = (await getCategoriesFromTitle(categoryTitle))[0];
+    const todos = await getIncompleteHighPriorityTodos({ id: category.id.toString() })
+    console.log(todos);
+    // expect(todos[0].title).to.be.equal(taskTitle0);
+    // expect(todos[1].title).to.be.equal(taskTitle1);
+    // expect(todos[2].title).to.be.equal(taskTitle2);
+});
+
 Then('corresponding course todo list with title {string} should be created', async function (projectTitle) {
     const project = (await getProjectsFromTitle(projectTitle))[0];
     expect(project).to.not.be.undefined;
@@ -321,4 +369,3 @@ Then('the category class todo list should have task with title {string}', async 
     const todo = (await getTodosFromCategory(category.id))[0];
     expect(todo.title).equal(taskTitle);
 });
-

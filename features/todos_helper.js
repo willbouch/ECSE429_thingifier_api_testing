@@ -93,6 +93,24 @@ const getTodosFromTitle = async title => {
     return res.body.todos;
 };
 
+const getIncompleteTodosFromProject = async projectId => {
+    const res = await chai.request(host).get(`/projects/${projectId}/tasks?doneStatus=false`);
+    return res.body.todos;
+};
+
+const assignTodoToCategory = async (todoId, category) => {
+    const todo = todoId.toString();
+    const res = await chai.request(host).post(`/categories/${category}/todos`).send(todo);
+    return res.body;
+};
+
+const assignTodosToCategory = async (todoIds, category) => {
+    for (const todoId of todoIds) {
+        await categorizeTodo(todoId, category);
+    }
+};
+
+
 module.exports = {
     createTodo: createTodo,
     createTodos: createTodos,
@@ -109,5 +127,8 @@ module.exports = {
     uncategorizeTodo: uncategorizeTodo,
     addTodosToProject: addTodosToProject,
     removeTodoFromProject: removeTodoFromProject,
+    getIncompleteTodosFromProject :getIncompleteTodosFromProject,
+    assignTodoToCategory: assignTodoToCategory,
+    assignTodosToCategory: assignTodosToCategory,
     deleteTodo: deleteTodo
 };

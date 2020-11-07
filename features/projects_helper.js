@@ -28,6 +28,12 @@ const getProjectsFromTitle = async title => {
     return res.body.projects;
 };
 
+const setProjectToComplete = async projectId => {
+    const body = {
+        completed: true
+    };
+    const res = await chai.request(host).post(`/projects/${projectId}`).send(body);
+
 const deleteProject = async (projectId) => {
     const res = await chai.request(host).delete(`/projects/${projectId}`);
     return res.body;
@@ -43,6 +49,7 @@ module.exports = {
     createProjects: createProjects,
     getProjects: getProjects,
     getProjectsFromTitle: getProjectsFromTitle,
+    setProjectToComplete: setProjectToComplete,
     deleteProject: deleteProject,
     updateProject: updateProject
 };
