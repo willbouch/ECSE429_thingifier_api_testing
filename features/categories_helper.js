@@ -28,8 +28,10 @@ const getCategoriesFromTitle = async title => {
     return res.body.categories;
 };
 
-const getIncompleteHighPriorityTodos = async title => {
-    return res = await chai.request(host).get(`/categories/${title}/todos?doneStatus=false`);
+const getIncompleteHighPriorityTodos = async categoryId => {
+    const res = await chai.request(host).get(`/categories/${categoryId}/todos?doneStatus=false`);
+    return res.body.todos;
+    //working after a post http://localhost:4567/categories/2/todos?doneStatus=false
 }
 
 module.exports = {

@@ -259,7 +259,7 @@ Then('the system should return all incomplete todos', async function () {
 
 Then('the system returns a list of {string} priority tasks including {string}, {string}, and {string}', async function (categoryTitle, taskTitle0, taskTitle1, taskTitle2){
     const category = (await getCategoriesFromTitle(categoryTitle))[0];
-    const todos = await getIncompleteHighPriorityTodos(category);
+    const todos = await getIncompleteHighPriorityTodos({ id: category.id.toString() })
     console.log(todos);
     // expect(todos[0].title).to.be.equal(taskTitle0);
     // expect(todos[1].title).to.be.equal(taskTitle1);
