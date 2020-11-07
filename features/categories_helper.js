@@ -28,9 +28,14 @@ const getCategoriesFromTitle = async title => {
     return res.body.categories;
 };
 
+const getIncompleteHighPriorityTodos = async title => {
+    return res = await chai.request(host).get(`/categories/${title}/todos?doneStatus=false`);
+}
+
 module.exports = {
     createCategory: createCategory,
     getCategoriesFromTitle: getCategoriesFromTitle,
     createCategories: createCategories,
-    getCategories: getCategories
+    getCategories: getCategories,
+    getIncompleteHighPriorityTodos: getIncompleteHighPriorityTodos
 };

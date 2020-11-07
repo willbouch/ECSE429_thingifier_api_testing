@@ -81,6 +81,11 @@ const getTodosFromTitle = async title => {
     return res.body.todos;
 };
 
+const getIncompleteTodosFromProject = async projectId => {
+    const res = await chai.request(host).get(`/projects/${projectId}/tasks?doneStatus=false`);
+    return res.body.todos;
+};
+
 module.exports = {
     createTodo: createTodo,
     createTodos: createTodos,
@@ -95,5 +100,6 @@ module.exports = {
     uncategorizeTodos: uncategorizeTodos,
     uncategorizeTodo: uncategorizeTodo,
     addTodosToProject: addTodosToProject,
-    removeTodoFromProject: removeTodoFromProject
+    removeTodoFromProject: removeTodoFromProject,
+    getIncompleteTodosFromProject :getIncompleteTodosFromProject
 };

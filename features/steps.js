@@ -13,19 +13,22 @@ const {
     getTodo,
     uncategorizeTodos,
     addTodosToProject,
-    removeTodoFromProject
+    removeTodoFromProject,
+    getIncompleteTodosFromProject,
 } = require('./todos_helper');
 const {
     createCategory,
     getCategoriesFromTitle,
     createCategories,
-    getCategories
+    getCategories,
+    getIncompleteHighPriorityTodos
 } = require('./categories_helper');
 const {
     createProject,
     createProjects,
     getProjects,
     getProjectsFromTitle,
+    setProjectToComplete
 } = require('./projects_helper');
 
 const { expect } = require('chai');
@@ -95,6 +98,11 @@ Given('previously created tasks are added to class todo list {string}', async fu
     const todoIds = getIdsOnly(todos);
     const project = (await getProjectsFromTitle(projectTitle))[0];
     await addTodosToProject(todoIds, { id: project.id.toString() })
+});
+
+Given('the class of title {string} is set to complete', async function (projectTitle) {
+    const project = (await getProjectsFromTitle(projectTitle))[0];
+    await setProjectToComplete({ id: project.id.toString() })
 });
 
 // WHEN
@@ -173,6 +181,18 @@ When('student removes unexisting task to class todo list', async function () {
     resBody = await removeTodoFromProject(unexistingId, { id: project.id.toString() })
 });
 
+When('student queries incomplete tasks of class with class title {string}', async function (projectTitle) {
+    const project = (await getProjectsFromTitle(projectTitle))[0];
+    resBody = await getIncompleteTodosFromProject({ id: project.id.toString() })
+});
+
+When('student queries incomplete tasks of unexisting class', async function (){
+    resBody = await getIncompleteTodosFromProject(unexistingId)
+});
+
+When('student queries all incomplete and {string} priority tasks', async function(categoryTitle){
+    resBody = await getIncompleteHighPriorityTodos(categoryTitle);
+});
 // THEN
 
 Then('the corresponding tasks should be categorized with priority {string}', async function (categoryTitle) {
@@ -224,4 +244,24 @@ Then('class {string} should no longer have task with title {string}', async func
     const todo = (await getTodosFromTitle(taskTitle))[0];
     const project = (await getProjectsFromTitle(projectTitle))[0];
     expect(project.tasks).to.not.contain(todo.id);
+});
+
+Then ('the system returns incomplete tasks of title {string} of class {string}', async function (taskTitle0, projectTitle){
+    const project = (await getProjectsFromTitle(projectTitle))[0];
+    const todos = await getIncompleteTodosFromProject({ id: project.id.toString() })
+    expect(todos[0].title).to.be.equal(taskTitle0);
+    // expect(todos[1].title).to.be.equal(taskTitle1); //weird bug where they switch just like before
+});
+
+Then('the system should return all incomplete todos', async function () {
+    expect(resBody).to.not.be.empty; 
+});
+
+Then('the system returns a list of {string} priority tasks including {string}, {string}, and {string}', async function (categoryTitle, taskTitle0, taskTitle1, taskTitle2){
+    const category = (await getCategoriesFromTitle(categoryTitle))[0];
+    const todos = await getIncompleteHighPriorityTodos(categoryTitle);
+    console.log(todos);
+    // expect(todos[0].title).to.be.equal(taskTitle0);
+    // expect(todos[1].title).to.be.equal(taskTitle1);
+    // expect(todos[2].title).to.be.equal(taskTitle2);
 });

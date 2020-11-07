@@ -28,9 +28,17 @@ const getProjectsFromTitle = async title => {
     return res.body.projects;
 };
 
+const setProjectToComplete = async projectId => {
+    const body = {
+        completed: true
+    };
+    const res = await chai.request(host).post(`/projects/${projectId}`).send(body);
+};
+
 module.exports = {
     createProject: createProject,
     createProjects: createProjects,
     getProjects: getProjects,
-    getProjectsFromTitle: getProjectsFromTitle
+    getProjectsFromTitle: getProjectsFromTitle,
+    setProjectToComplete: setProjectToComplete
 };
