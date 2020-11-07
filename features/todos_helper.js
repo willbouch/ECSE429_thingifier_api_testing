@@ -25,7 +25,7 @@ const deleteTodo = async (todoId) => {
 const categorizeTodo = async (todoId, category) => {
     const res = await chai.request(host).post(`/todos/${todoId}/categories`).send(category);
     // BUGGY
-    // await chai.request(host).post(`/categories/${category.id}/todos`).send({id: todoId.toString()});
+    await chai.request(host).post(`/categories/${category.id}/todos`).send({id: todoId.toString()});
     return res.body;
 };
 
