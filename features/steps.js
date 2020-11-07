@@ -318,7 +318,6 @@ Then('corresponding course todo list with title {string} should be created with 
 
 Then('the category class todo list should have task with title {string}', async function (taskTitle) {
     const category = (await getCategories())[0];
-    console.log(await getCategories())
     const todo = (await getTodosFromCategory(category.id))[0];
     expect(todo.title).equal(taskTitle);
 });
