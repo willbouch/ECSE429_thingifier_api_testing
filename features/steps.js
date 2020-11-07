@@ -9,6 +9,7 @@ const {
     categorizeTodos,
     getTodos,
     getTodosFromTitle,
+    getTodosFromCategory,
     addTodoToProject,
     getTodo,
     uncategorizeTodos,
@@ -16,6 +17,7 @@ const {
     removeTodoFromProject,
     getIncompleteTodosFromProject,
     assignTodosToCategory,
+    deleteTodo
 } = require('./todos_helper');
 const {
     createCategory,
@@ -29,7 +31,9 @@ const {
     createProjects,
     getProjects,
     getProjectsFromTitle,
-    setProjectToComplete
+    setProjectToComplete,
+    deleteProject,
+    updateProject,
 } = require('./projects_helper');
 
 const { expect } = require('chai');
@@ -47,6 +51,11 @@ Given('the system is running on localhost and is clean', async function () {
 Given('tasks with the following details are created:', async function (rawTasks) {
     const todos = convertToObjects(rawTasks);
     await createTodos(todos);
+});
+
+Given('categories with the following details are created:', async function (rawCategories) {
+    const categories = convertToObjects(rawCategories);
+    await createCategories(categories);
 });
 
 Given('category with title {string} and description {string} is created', async function (categoryTitle, categoryDescription) {
@@ -82,7 +91,7 @@ Given('task with title {string} already has doneStatus {string}', async function
     });
 });
 
-Given('projects with the following details are created:', async function (rawProjects) {
+Given('courses with the following details are created:', async function (rawProjects) {
     const projects = convertToObjects(rawProjects);
     await createProjects(projects);
 });
@@ -172,6 +181,13 @@ When('student removes previous categorization with priority {string}', async fun
     await uncategorizeTodos(todoIds, category.id);
 });
 
+When('student recategorizes existing tasks with priority {string}', async function (categoryTitle) {
+    const category = (await getCategoriesFromTitle(categoryTitle))[0];
+    const todos = await getTodos();
+    const todoIds = getIdsOnly(todos);
+    await categorizeTodos(todoIds, { id: category.id.toString() });
+});
+
 When('student adjusts priority of unexisting task', async function () {
     const category = (await getCategories())[0];
     resBody = await categorizeTodo(unexistingId, { id: category.id.toString() })
@@ -200,9 +216,53 @@ When('student queries incomplete tasks of unexisting class', async function (){
 When('student queries all incomplete and {string} priority tasks', async function(categoryTitle){
     resBody = await getIncompleteHighPriorityTodos(categoryTitle);
 });
+
+When('course to do list with title {string} and description {string} is created', async function (projectTitle, projectDescription) {
+    await createProject({ title: projectTitle, description: projectDescription });
+});
+
+When('course with title {string} is removed', async function (projectTitle) {
+    const project = (await getProjectsFromTitle(projectTitle))[0];
+    await deleteProject(project.id);
+});
+
+When('student changes course with title {string} to be inactive', async function (projectTitle) {
+    const project = (await getProjectsFromTitle(projectTitle))[0];
+    await updateProject(project.id, { active: false });
+});
+
+When('student removes unexistent course', async function () {
+    resBody = await deleteProject(unexistingId)
+});
+
+
+When('student replaces the existing task with title {string} with a new description {string}', async function (taskTitle, taskDescription) {
+    const todo = (await getTodosFromTitle(taskTitle))[0];
+    await createTodo({ title: taskTitle, description: taskDescription });
+    await deleteTodo(todo.id);
+});
+
+When('course to do list with title {string} and description {string} is created as a category', async function (categoryTitle, categoryDescription) {
+    resBody = await createCategory({ title: categoryTitle, description: categoryDescription });
+});
+
+When('student categorizes task with title {string} to class todo list', async function (taskTitle) {
+    const todo = (await getTodosFromTitle(taskTitle))[0];
+    const category = (await getCategories())[0];
+    await categorizeTodo(todo.id, { id: category.id.toString() });
+});
+
 // THEN
 
 Then('the corresponding tasks should be categorized with priority {string}', async function (categoryTitle) {
+    const category = (await getCategoriesFromTitle(categoryTitle))[0];
+    const todos = await getTodos();
+    todos.forEach(todo => {
+        expect(todo.categories[0].id).to.equal(category.id);
+    });
+});
+
+Then('the corresponding tasks should still be categorized with priority {string}', async function (categoryTitle) {
     const category = (await getCategoriesFromTitle(categoryTitle))[0];
     const todos = await getTodos();
     todos.forEach(todo => {
@@ -271,4 +331,41 @@ Then('the system returns a list of {string} tasks including {string}, {string}, 
     // expect(todos[0].title).to.be.equal(taskTitle0);
     // expect(todos[1].title).to.be.equal(taskTitle1);
     // expect(todos[2].title).to.be.equal(taskTitle2);
+});
+
+Then('corresponding course todo list with title {string} should be created', async function (projectTitle) {
+    const project = (await getProjectsFromTitle(projectTitle))[0];
+    expect(project).to.not.be.undefined;
+});
+
+Then('corresponding course with title {string} should be removed', async function (projectTitle) {
+    const project = (await getProjectsFromTitle(projectTitle))[0];
+    expect(project).to.be.undefined;
+});
+
+Then('the corresponding course with title {string} should be inactive', async function (projectTitle) {
+    const project = (await getProjectsFromTitle(projectTitle))[0];
+    expect(project.active).equal('false');
+});
+
+Then('the task with title {string} should be marked as done', async function (taskTitle) {
+    const todo = (await getTodosFromTitle(taskTitle))[0];
+    expect(todo.doneStatus).equal('true');
+});
+
+Then('the old task should be removed and a new one with a new description {string} should exist', async function (taskDescription) {
+    const todos = await getTodos();
+    expect(todos).to.have.lengthOf(1);
+    expect(todos[0].description).to.be.equal(taskDescription);
+});
+
+Then('corresponding course todo list with title {string} should be created with description {string}', async function (categoryTitle, categoryDescription) {
+    const category = (await getCategoriesFromTitle(categoryTitle))[0];
+    expect(category.description).equal(categoryDescription);
+});
+
+Then('the category class todo list should have task with title {string}', async function (taskTitle) {
+    const category = (await getCategories())[0];
+    const todo = (await getTodosFromCategory(category.id))[0];
+    expect(todo.title).equal(taskTitle);
 });
