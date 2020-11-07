@@ -15,6 +15,7 @@ const {
     addTodosToProject,
     removeTodoFromProject,
     getIncompleteTodosFromProject,
+    assignTodosToCategory,
 } = require('./todos_helper');
 const {
     createCategory,
@@ -105,6 +106,12 @@ Given('the class of title {string} is set to complete', async function (projectT
     await setProjectToComplete({ id: project.id.toString() })
 });
 
+Given('the category {string} is assigned to each todo', async function (categoryTitle) {
+    const category = (await getCategoriesFromTitle(categoryTitle))[0];
+    const todos = await getTodos();
+    const todoIds = getIdsOnly(todos);
+    await assignTodosToCategory(todoIds, { id: category.id.toString() })
+});
 // WHEN
 
 When('student categorizes existing tasks with priority {string}', async function (categoryTitle) {
@@ -257,7 +264,7 @@ Then('the system should return all incomplete todos', async function () {
     expect(resBody).to.not.be.empty; 
 });
 
-Then('the system returns a list of {string} priority tasks including {string}, {string}, and {string}', async function (categoryTitle, taskTitle0, taskTitle1, taskTitle2){
+Then('the system returns a list of {string} tasks including {string}, {string}, and {string}', async function (categoryTitle, taskTitle0, taskTitle1, taskTitle2){
     const category = (await getCategoriesFromTitle(categoryTitle))[0];
     const todos = await getIncompleteHighPriorityTodos({ id: category.id.toString() })
     console.log(todos);

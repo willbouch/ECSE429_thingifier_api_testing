@@ -86,6 +86,19 @@ const getIncompleteTodosFromProject = async projectId => {
     return res.body.todos;
 };
 
+const assignTodoToCategory = async (todoId, category) => {
+    const todo = todoId.toString();
+    const res = await chai.request(host).post(`/categories/${category}/todos`).send(todo);
+    return res.body;
+};
+
+const assignTodosToCategory = async (todoIds, category) => {
+    for (const todoId of todoIds) {
+        await categorizeTodo(todoId, category);
+    }
+};
+
+
 module.exports = {
     createTodo: createTodo,
     createTodos: createTodos,
@@ -101,5 +114,7 @@ module.exports = {
     uncategorizeTodo: uncategorizeTodo,
     addTodosToProject: addTodosToProject,
     removeTodoFromProject: removeTodoFromProject,
-    getIncompleteTodosFromProject :getIncompleteTodosFromProject
+    getIncompleteTodosFromProject :getIncompleteTodosFromProject,
+    assignTodoToCategory: assignTodoToCategory,
+    assignTodosToCategory: assignTodosToCategory
 };
