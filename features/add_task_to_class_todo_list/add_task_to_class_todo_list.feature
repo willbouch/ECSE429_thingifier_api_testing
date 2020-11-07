@@ -24,7 +24,7 @@ Feature: THING-002: Add a task to a class todo list
 
     Scenario Outline: As a student, I can add a task to a class todo list represented as category (alternate flow)
         Given task with title <task_title> and description <task_description> is created
-        When student categorizes task with title <task_title> to class todo list
+        When student adds task with title <task_title> to class todo list represented as category
         Then the category class todo list should have task with title <task_title>
         Examples:
             | task_title                      | task_description          |

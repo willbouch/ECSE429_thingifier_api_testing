@@ -27,10 +27,3 @@ Feature: THING-007: Query incomplete tasks for a class
     Given the class of title 'ECSE429' is set to complete
     When student queries incomplete tasks of class with class title 'ECSE429' 
     Then the system returns incomplete tasks of title 'Study for Test' of class 'ECSE429' 
-
-
-
-
-
-    
-
