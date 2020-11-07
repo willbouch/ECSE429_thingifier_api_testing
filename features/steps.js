@@ -209,11 +209,11 @@ When('student queries incomplete tasks of class with class title {string}', asyn
     resBody = await getIncompleteTodosFromProject({ id: project.id.toString() })
 });
 
-When('student queries incomplete tasks of unexisting class', async function (){
+When('student queries incomplete tasks of unexisting class', async function () {
     resBody = await getIncompleteTodosFromProject(unexistingId)
 });
 
-When('student queries all incomplete and {string} priority tasks', async function(categoryTitle){
+When('student queries all incomplete and {string} priority tasks', async function (categoryTitle) {
     resBody = await getIncompleteHighPriorityTodos(categoryTitle);
 });
 
@@ -313,7 +313,7 @@ Then('class {string} should no longer have task with title {string}', async func
     expect(project.tasks).to.not.contain(todo.id);
 });
 
-Then ('the system returns incomplete tasks of title {string} of class {string}', async function (taskTitle0, projectTitle){
+Then('the system returns incomplete tasks of title {string} of class {string}', async function (taskTitle0, projectTitle) {
     const project = (await getProjectsFromTitle(projectTitle))[0];
     const todos = await getIncompleteTodosFromProject({ id: project.id.toString() })
     expect(todos[0].title).to.be.equal(taskTitle0);
@@ -321,10 +321,10 @@ Then ('the system returns incomplete tasks of title {string} of class {string}',
 });
 
 Then('the system should return all incomplete todos', async function () {
-    expect(resBody).to.not.be.empty; 
+    expect(resBody).to.not.be.empty;
 });
 
-Then('the system returns a list of {string} tasks including {string}, {string}, and {string}', async function (categoryTitle, taskTitle0, taskTitle1, taskTitle2){
+Then('the system returns a list of {string} tasks including {string}, {string}, and {string}', async function (categoryTitle, taskTitle0, taskTitle1, taskTitle2) {
     const category = (await getCategoriesFromTitle(categoryTitle))[0];
     const todos = await getIncompleteHighPriorityTodos({ id: category.id.toString() })
     console.log(todos);

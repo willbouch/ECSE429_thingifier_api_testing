@@ -33,6 +33,7 @@ const setProjectToComplete = async projectId => {
         completed: true
     };
     const res = await chai.request(host).post(`/projects/${projectId}`).send(body);
+};
 
 const deleteProject = async (projectId) => {
     const res = await chai.request(host).delete(`/projects/${projectId}`);
