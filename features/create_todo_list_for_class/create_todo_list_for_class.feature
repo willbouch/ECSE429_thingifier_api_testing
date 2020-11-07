@@ -15,7 +15,7 @@ Feature: THING-005: Create a todo list for a class
             | 'MATH240'     | 'Mathematics'            |
             | 'COMP302'     | 'Functional programming' |
 
-    Scenario Outline: As a student, I can create a todo list for a class (alternate flow)
+    Scenario Outline: As a student, I can create a todo list for a class represented as category (alternate flow)
         When course to do list with title <category_title> and description <category_description> is created as a category
         Then corresponding course todo list with title <category_title> should be created with description <category_description>
         Examples:

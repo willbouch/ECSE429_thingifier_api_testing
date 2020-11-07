@@ -22,7 +22,7 @@ Feature: THING-002: Add a task to a class todo list
             | 'Understand cucumber on NodeJs' | 'Focus on implementation' |
             | 'Write Gherkin scripts'         | ''                        |
 
-    Scenario Outline: As a student, I can add a task to a class todo list (alternate flow)
+    Scenario Outline: As a student, I can add a task to a class todo list represented as category (alternate flow)
         Given task with title <task_title> and description <task_description> is created
         When student categorizes task with title <task_title> to class todo list
         Then the category class todo list should have task with title <task_title>
