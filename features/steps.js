@@ -233,7 +233,7 @@ Then('the corresponding tasks should be categorized with priority {string}', asy
     const category = (await getFromTitle('categories', categoryTitle))[0];
     const todos = await getAll('todos');
     todos.forEach(todo => {
-        expect(todo.categories[0].id).to.equal(category.id);
+        expect(todo.categories).to.deep.include({ id: category.id });
     });
 });
 
