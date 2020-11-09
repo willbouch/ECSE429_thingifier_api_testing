@@ -307,12 +307,10 @@ Then('class {string} should no longer have task with title {string}', async func
     expect(project.tasks).to.not.contain(todo.id);
 });
 
-Then('the system returns incomplete tasks of title {string} of class {string}', async function (taskTitle, projectTitle) {
-    const project = (await getFromTitle('projects', projectTitle))[0];
-    const todos = await getOneRelationship('projects', project.id, 'tasks', { doneStatus: 'false' });
-    expect(todos[0].title).to.be.equal(taskTitle);
-    // TO DOUBLE CHECK
-    // expect(todos[1].title).to.be.equal(taskTitle1); //weird bug where they switch just like before
+Then('the system returns incomplete tasks of class {string}', async function (projectTitle) {
+    resBody.forEach(todo => {
+        expect(todo.doneStatus).to.equal('false');
+    });
 });
 
 Then('the system should return all incomplete todos', async function () {
