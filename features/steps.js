@@ -42,6 +42,10 @@ Given('category with title {string} and description {string} is created', async 
     await createOne('categories', { title: categoryTitle, description: categoryDescription });
 });
 
+Given('project with title {string} and description {string} is created', async function (projectTitle, projectDescription) {
+    await createOne('projects', { title: projectTitle, description: projectDescription });
+});
+
 Given('category with title {string} is created', async function (categoryTitle) {
     await createOne('categories', { title: categoryTitle });
 });
@@ -227,6 +231,13 @@ When('course to do list with title {string}, description {string} and term {stri
     resBody = await createOne('projects', { title: projectTitle, description: projectDescription, term: projectTerm });
 });
 
+When('student categorizes as project existing tasks with priority {string}', async function (projectTitle) {
+    const project = (await getFromTitle('projects', projectTitle))[0];
+    const todos = await getAll('todos');
+    const todoIds = getIdsOnly(todos);
+    await createMultipleRelationships('todos', todoIds, 'tasksof', project.id);
+});
+
 // THEN
 
 Then('the corresponding tasks should be categorized with priority {string}', async function (categoryTitle) {
@@ -234,6 +245,14 @@ Then('the corresponding tasks should be categorized with priority {string}', asy
     const todos = await getAll('todos');
     todos.forEach(todo => {
         expect(todo.categories).to.deep.include({ id: category.id });
+    });
+});
+
+Then('the corresponding tasks should be categorized as project with priority {string}', async function (projectTitle) {
+    const project = (await getFromTitle('projects', projectTitle))[0];
+    const todos = await getAll('todos');
+    todos.forEach(todo => {
+        expect(todo.tasksof).to.deep.include({ id: project.id });
     });
 });
 

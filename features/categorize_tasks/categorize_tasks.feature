@@ -21,6 +21,16 @@ Feature: THING-001: Categorize tasks with priority
             | 'MEDIUM Priority' | 'medium important' |
             | 'LOW Priority'    | 'least important'  |
 
+    Scenario Outline: As a student, I can categorize tasks using projects with priority (alternate flow)
+        Given project with title <proj_title> and description <proj_description> is created
+        When student categorizes as project existing tasks with priority <proj_title>
+        Then the corresponding tasks should be categorized as project with priority <proj_title>
+        Examples:
+            | proj_title        | proj_description   |
+            | 'HIGH Priority'   | 'most important'   |
+            | 'MEDIUM Priority' | 'medium important' |
+            | 'LOW Priority'    | 'least important'  |
+
     Scenario: As a student, I cannot categorize a task with an unexisting category (error flow)
         When student creates an instance of relationship between a task and unexisting category
         Then the system should send 'Could not find thing matching value for id' as error message
