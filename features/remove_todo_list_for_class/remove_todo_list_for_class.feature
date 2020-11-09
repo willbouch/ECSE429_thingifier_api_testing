@@ -20,7 +20,7 @@ Feature: THING-006: Remove a todo list for a class
             | 'ECSE428'     |
             | 'MATH240'     |
 
-    Scenario Outline: As a student, I can mark a to do list as inactive (alternate flow)
+    Scenario Outline: As a student, I can mark a to do list as inactive instead of removing it (alternate flow)
         When student changes course with title <project_title> to be inactive
         Then the corresponding course with title <project_title> should be inactive
         Examples:

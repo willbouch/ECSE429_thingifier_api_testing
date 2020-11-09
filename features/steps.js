@@ -174,9 +174,9 @@ When('student removes task with title {string} from class {string}', async funct
     await deleteOneRelationship('todos', todo.id, 'tasksof', project.id);
 });
 
-When('student removes unexisting task to class todo list', async function () {
-    const project = (await getAll('projects'))[0];
-    resBody = await deleteOneRelationship('todos', unexistingId, 'tasksof', project.id);
+When('student removes task from unexisting class todo list', async function () {
+    const todo = (await getAll('todos'))[0];
+    resBody = await deleteOneRelationship('todos', todo.id, 'tasksof', unexistingId);
 });
 
 When('student queries incomplete tasks of class with class title {string}', async function (projectTitle) {
@@ -221,6 +221,10 @@ When('student adds task with title {string} to class todo list represented as ca
     const todo = (await getFromTitle('todos', taskTitle))[0];
     const category = (await getAll('categories'))[0];
     await createOneRelationship('todos', todo.id, 'categories', category.id);
+});
+
+When('course to do list with title {string}, description {string} and term {string} is created', async function (projectTitle, projectDescription, projectTerm) {
+    resBody = await createOne('projects', { title: projectTitle, description: projectDescription, term: projectTerm });
 });
 
 // THEN

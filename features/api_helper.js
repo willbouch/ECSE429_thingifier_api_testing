@@ -33,7 +33,8 @@ const getOneRelationship = async (option1, id, option2, queryParams) => {
 };
 
 const createOne = async (option, object) => {
-    await chai.request(host).post(`/${option}`).send(object);
+    const res = await chai.request(host).post(`/${option}`).send(object);
+    return res.body;
 };
 
 const createMultiple = async (option, objects) => {
