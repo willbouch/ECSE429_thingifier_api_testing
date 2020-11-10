@@ -100,6 +100,12 @@ Given('the category {string} is assigned to each todo', async function (category
     // BUGGY BEHAVIOUR HERE
     await createMultipleRelationships('todos', todoIds, 'categories', category.id);
 });
+
+Given('the {string} category does not exist', async function (categoryTitle) {
+    const category = (await getFromTitle('categories', categoryTitle))[0];
+    resBody = category;
+    await deleteOne('categories', category.id);
+});
 // WHEN
 
 When('student categorizes existing tasks with priority {string}', async function (categoryTitle) {
@@ -238,6 +244,18 @@ When('student categorizes as project existing tasks with priority {string}', asy
     await createMultipleRelationships('todos', todoIds, 'tasksof', project.id);
 });
 
+When('student queries all incomplete and {string} tasks', async function (categoryTitle) {
+    const category = (await getFromTitle('categories', categoryTitle))[0];
+    resBody = await getOneRelationship('categories', category.id, 'todos', { doneStatus: 'false' });
+});
+
+When('student queries all incomplete tasks of a unexistent priority', async function () {
+    const unexistingPriority = resBody;
+    resBody = await getOneRelationship('categories', unexistingPriority.id, 'todos', { doneStatus: 'false' });
+    console.log(resBody);   
+});
+
+
 // THEN
 
 Then('the corresponding tasks should be categorized with priority {string}', async function (categoryTitle) {
@@ -353,3 +371,16 @@ Then('the category class todo list should have task with title {string}', async 
     const todo = (await getOneRelationship('categories', category.id, 'todos'))[0];
     expect(todo.title).equal(taskTitle);
 });
+
+Then('the system returns incomplete tasks of category {string}', async function (categoryTitle) {
+    const category = (await getFromTitle('categories', categoryTitle))[0];
+    resBody.forEach(todo => {
+        expect(todo.doneStatus).to.equal('false');
+        expect(todo.categories).to.deep.include({ id: category.id })
+    });
+});
+
+Then('the system should return an empty list of todos', async function () {
+    // console.log(resBody);
+    // expect(resBody.todos).to.be.empty;
+  });

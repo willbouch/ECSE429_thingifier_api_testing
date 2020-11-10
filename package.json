@@ -8,7 +8,7 @@
     "test:categories": "CHOMA_SEED=$(date +%s) mocha --timeout --require choma 10000 test/categories.test.js --require choma",
     "test:todos": "CHOMA_SEED=$(date +%s) mocha --timeout 10000 test/todos.test.js --require choma",
     "test:projects": "CHOMA_SEED=$(date +%s) mocha --timeout 10000 test/projects.test.js --require choma",
-    "cucumber": "npx cucumber-js --order random:$(date +%s)"
+    "cucumber": "npx cucumber-js"
   },
   "author": "WB, EC, LB, KM",
   "license": "ISC",
