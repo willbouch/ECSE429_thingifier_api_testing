@@ -10,7 +10,7 @@ Feature: THING-007: Query incomplete tasks for a class
             | ECSE429 | false     | true   | Software validation |
         And tasks with the following details are created:
             | title             | doneStatus | description           |
-            | ECSE429 Part B    | false       | Write gherkin scripts |
+            | ECSE429 Part B    | false      | Write gherkin scripts |
             | Submit class work | true       | In-class every monday |
             | Study for Test    | false      | 20% timed test        |
         And previously created tasks are added to class todo list 'ECSE429'
