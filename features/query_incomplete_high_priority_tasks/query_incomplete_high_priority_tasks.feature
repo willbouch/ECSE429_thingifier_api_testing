@@ -26,7 +26,7 @@ Feature: THING-008: Query incomplete HIGH priority tasks
 
     Scenario: As a student I cannot query HIGH Priority tasks if 'HIGH Priority' does not exist (error flow)
         Given the 'HIGH Priority' category does not exist
-        When student queries all incomplete tasks of a unexistent priority
+        When student queries all incomplete and 'HIGH Priority' tasks
         Then the system should return an empty list of todos
 
 
