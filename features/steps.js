@@ -208,8 +208,8 @@ When('student queries incomplete tasks of class with class title {string}', asyn
     resBody = await getOneRelationship('projects', project.id, 'tasks', { doneStatus: 'false' });
 });
 
-When('student queries incomplete tasks of unexisting class', async function () {
-    resBody = await getOneRelationship('projects', unexistingId, 'tasks', { doneStatus: 'false' });
+When('student queries incomplete tasks of unexisting class with id {int}', async function (id) {
+    resBody = await getOneRelationship('projects', id, 'tasks', { doneStatus: 'false' });
 });
 
 When('course to do list with title {string} and description {string} is created', async function (projectTitle, projectDescription) {
