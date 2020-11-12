@@ -4,11 +4,11 @@
   "description": "thingifier api testing",
   "main": "index.js",
   "scripts": {
-    "test": "CHOMA_SEED=$(date +%s) mocha -timeout 10000 --require choma",
-    "test:categories": "CHOMA_SEED=$(date +%s) mocha --timeout --require choma 10000 test/categories.test.js --require choma",
-    "test:todos": "CHOMA_SEED=$(date +%s) mocha --timeout 10000 test/todos.test.js --require choma",
-    "test:projects": "CHOMA_SEED=$(date +%s) mocha --timeout 10000 test/projects.test.js --require choma",
-    "cucumber": "npx cucumber-js"
+    "test": "CHOMA_SEED=$RANDOM mocha -timeout 10000 --require choma",
+    "test:categories": "CHOMA_SEED=$RANDOM mocha --timeout --require choma 10000 test/categories.test.js --require choma",
+    "test:todos": "CHOMA_SEED=$RANDOM mocha --timeout 10000 test/todos.test.js --require choma",
+    "test:projects": "CHOMA_SEED=$RANDOM mocha --timeout 10000 test/projects.test.js --require choma",
+    "cucumber": "npx cucumber-js --order random:$RANDOM"
   },
   "author": "WB, EC, LB, KM",
   "license": "ISC",
