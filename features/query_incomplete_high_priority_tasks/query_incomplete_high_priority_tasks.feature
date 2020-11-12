@@ -37,11 +37,11 @@ Feature: THING-008: Query incomplete HIGH priority tasks
             | 'HIGH Priority' | 'DPM beta'         |
             | 'HIGH Priority' | 'COMP360 midterm ' |
 
-
     Scenario Outline: As a student I cannot query HIGH Priority tasks if 'HIGH Priority' does not exist (error flow)
-        Given the <category_title> category does not exist
-        When student queries all incomplete and <category_title> tasks
+        When student queries all incomplete tasks for unexisting category with id <id>
         Then the system should return an empty list of todos
         Examples:
-            | category_title  |
-            | 'HIGH Priority' |
+            | id        |
+            | 123456789 |
+            | 987654321 |
+            | 192837465 |

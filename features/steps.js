@@ -121,11 +121,6 @@ Given('the category {string} is assigned to each todo', async function (category
     await createMultipleRelationships('todos', todoIds, 'categories', category.id);
 });
 
-Given('the {string} category does not exist', async function (categoryTitle) {
-    const category = (await getFromTitle('categories', categoryTitle))[0];
-    resBody = category;
-    await updateOne('categories', category.id, { title: 'Some unimportant title' });
-});
 // WHEN
 
 When('student categorizes existing tasks with priority {string}', async function (categoryTitle) {
@@ -265,7 +260,10 @@ When('student categorizes as project existing tasks with priority {string}', asy
 
 When('student queries all incomplete and {string} tasks', async function (categoryTitle) {
     const category = (await getFromTitle('categories', categoryTitle))[0];
-    const id = category ? category.id : unexistingId;
+    resBody = await getOneRelationship('categories', category.id, 'todos', { doneStatus: 'false' });
+});
+
+When('student queries all incomplete tasks for unexisting category with id {int}', async function (id) {
     resBody = await getOneRelationship('categories', id, 'todos', { doneStatus: 'false' });
 });
 
