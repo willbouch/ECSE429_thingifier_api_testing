@@ -12,3 +12,4 @@
 ### Parsing and executing Gherkin scripts with Cucumber
 1. Run ``` npm i ``` to install the dependencies
 2. Run ``` npm run cucumber ```
+**NOTE In the case of ``` npm run cucumber ``` not working, simply run npx cucumber-js --order random:\<any seed that you want\>
