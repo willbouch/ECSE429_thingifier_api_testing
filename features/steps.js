@@ -1,5 +1,11 @@
-const { Given, When, Then } = require('cucumber');
-const { runServer, convertToObjects, getIdsOnly } = require('./helper');
+const { Given, When, Then, After, BeforeAll, AfterAll } = require('cucumber');
+const { 
+    runServer,
+    shutdownServer,
+    isServerUp,
+    convertToObjects,
+    getIdsOnly
+} = require('./helper');
 const {
     getFromTitle,
     getFromId,
@@ -13,7 +19,8 @@ const {
     createOneRelationship,
     createMultipleRelationships,
     deleteOneRelationship,
-    deleteMultipleRelationships
+    deleteMultipleRelationships,
+    cleanUp
 } = require('./api_helper');
 
 const { expect } = require('chai');
@@ -22,10 +29,23 @@ const unexistingId = 123456789;
 
 let resBody;
 
+BeforeAll(async function() {
+    await runServer();
+});
+
+AfterAll(async function() {
+    await shutdownServer();
+});
+
+After(async function () {
+    await cleanUp();
+});
+
 // GIVEN
 
 Given('the system is running on localhost and is clean', async function () {
-    await runServer();
+    const running = await isServerUp();
+    expect(running).to.be.equal(true);
 });
 
 Given('tasks with the following details are created:', async function (rawTasks) {

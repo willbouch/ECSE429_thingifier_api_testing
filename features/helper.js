@@ -52,6 +52,21 @@ const runServer = async () => {
     // Otherwise, server is running and clean
 };
 
+const shutdownServer = async () => {
+    try {
+        await chai.request(host).get('/shutdown');
+    } catch (e) { }
+};
+
+const isServerUp = async () => {
+    try {
+        await chai.request(host).get('/docs');
+        return true;
+    } catch (e) {
+        return false;
+    }
+};
+
 const getIdsOnly = array => {
     const ids = array.reduce((prev, curr) => {
         const temp = prev;
@@ -64,5 +79,7 @@ const getIdsOnly = array => {
 module.exports = {
     convertToObjects: convertToObjects,
     runServer: runServer,
+    isServerUp: isServerUp,
+    shutdownServer: shutdownServer,
     getIdsOnly: getIdsOnly
 };

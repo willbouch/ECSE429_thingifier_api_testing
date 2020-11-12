@@ -99,6 +99,10 @@ const deleteMultipleRelationships = async (option1, id1s, option2, id2) => {
     }
 };
 
+const cleanUp = async () => {
+    await chai.request(host).post('/admin/data/thingifier');
+};
+
 module.exports = {
     getFromTitle: getFromTitle,
     getFromId: getFromId,
@@ -113,4 +117,5 @@ module.exports = {
     createMultipleRelationships: createMultipleRelationships,
     deleteOneRelationship: deleteOneRelationship,
     deleteMultipleRelationships: deleteMultipleRelationships,
+    cleanUp: cleanUp
 };
