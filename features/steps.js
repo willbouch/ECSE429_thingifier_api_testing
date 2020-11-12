@@ -25,8 +25,6 @@ const {
 
 const { expect } = require('chai');
 
-const unexistingId = 123456789;
-
 let resBody;
 
 BeforeAll(async function () {
@@ -117,7 +115,7 @@ Given('the category {string} is assigned to each todo', async function (category
     const category = (await getFromTitle('categories', categoryTitle))[0];
     const todos = await getAll('todos');
     const todoIds = getIdsOnly(todos);
-    // BUGGY BEHAVIOUR HERE
+    // BUGGY BEHAVIOUR HERE (Explained inside the createOneRelationship function which is called by createMultipleRelationships)
     await createMultipleRelationships('todos', todoIds, 'categories', category.id);
 });
 
@@ -134,11 +132,6 @@ When('student categorizes existing task with priority {string}', async function 
     const category = (await getFromTitle('categories', categoryTitle))[0];
     const todos = await getAll('todos');
     await createOneRelationship('todos', todos[0].id, 'categories', category.id);
-});
-
-When('student creates an instance of relationship between a task and unexisting category', async function () {
-    const todos = await getAll('todos');
-    resBody = await createOneRelationship('todos', todos[0].id, 'categories', unexistingId);
 });
 
 When('student creates an instance of relationship for unexisting task with id {int}', async function (id) {
@@ -396,7 +389,7 @@ Then('the system should return an empty list of todos', async function () {
     // expect(resBody).to.be.empty;
     /*
     THIS IS A BUG - SHOULD BE --> expect(resBody).to.be.empty;
-    This bug was flagged in exploratory sessions in Part A. Basically, when providing an id if undexisting
+    This bug was flagged in exploratory sessions in Part A. Basically, when providing an id of unexisting
     category, the API should either return an empty list of todos, or an error message. For this test, we
     decided to choose the former. However, the result we get is the list of todos related to an id that is not
     the one we provided. Indeed, the API seems to return the list of todos related to the first category it can
