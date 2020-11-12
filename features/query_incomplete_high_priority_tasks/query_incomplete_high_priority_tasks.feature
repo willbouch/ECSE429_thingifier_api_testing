@@ -20,14 +20,22 @@ Feature: THING-008: Query incomplete HIGH priority tasks
         And category with title 'HIGH Priority' is created
         And the category 'HIGH Priority' is assigned to each todo
 
-    Scenario: As a student, I can query incomplete HIGH Priority tasks for all classes (normal flow)
-        When student queries all incomplete and 'HIGH Priority' tasks
-        Then the system returns incomplete tasks of category 'HIGH Priority'
+    Scenario Outline: As a student, I can query incomplete HIGH Priority tasks for all classes (normal flow)
+        When student queries all incomplete and <category_title> tasks
+        Then the system returns incomplete tasks of category <category_title>
+        Examples:
+            | category_title  |
+            | 'HIGH Priority' |
 
-    Scenario: As a student I cannot query HIGH Priority tasks if 'HIGH Priority' does not exist (error flow)
-        Given the 'HIGH Priority' category does not exist
-        When student queries all incomplete and 'HIGH Priority' tasks
-        Then the system should return an empty list of todos
+    Scenario Outline: As a student, once I have marked a task as done it is no longer in the list of incomplete HIGH Priority tasks (alternative flow)
+        Given student marks task with title <task_title> as done
+        When student queries all incomplete and <category_title> tasks
+        Then the system returns incomplete tasks of category <category_title>
+        Examples:
+            | category_title  | task_title         |
+            | 'HIGH Priority' | 'ECSE429 Part B'   |
+            | 'HIGH Priority' | 'DPM beta'         |
+            | 'HIGH Priority' | 'COMP360 midterm ' |
 
 
     Scenario: As a student, once I have marked a task as done it is no longer in the list of incomplete HIGH Priority tasks (alternative flow)
