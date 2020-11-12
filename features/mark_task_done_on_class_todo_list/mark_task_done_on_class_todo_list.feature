@@ -21,9 +21,14 @@ Feature: THING-003: Mark a task done on class todo list
             | 'COMP551 Project 2' | 'false'    | 'true'     |
             | 'Climbing'          | 'false'    | 'true'     |
 
-    Scenario: As a student, I cannot mark a unexisting task as done (error flow)
-        When student marks a unexisting task as done
-        Then the system should send 'No such todo entity instance with GUID or ID' as error message
+    Scenario Outline: As a student, I cannot mark a unexisting task as done (error flow)
+        When student marks an unexisting task with id <id> as done
+        Then the system should send <error> as error message
+        Examples:
+            | id        | error                                                          |
+            | 123456789 | 'No such todo entity instance with GUID or ID 123456789 found' |
+            | 987654321 | 'No such todo entity instance with GUID or ID 987654321 found' |
+            | 192837465 | 'No such todo entity instance with GUID or ID 192837465 found' |
 
     Scenario Outline: As a student, I can mark a task that is already done as done (alternative flow)
         Given task with title <task_title> already has doneStatus <old_status>

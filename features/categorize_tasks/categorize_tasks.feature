@@ -31,11 +31,12 @@ Feature: THING-001: Categorize tasks with priority
             | 'MEDIUM Priority' | 'medium important' |
             | 'LOW Priority'    | 'least important'  |
 
-    Scenario: As a student, I cannot categorize a task with an unexisting category (error flow)
-        When student creates an instance of relationship between a task and unexisting category
-        Then the system should send 'Could not find thing matching value for id' as error message
-
-    Scenario: As a student, I cannot categorize a unexisting task (error flow)
+    Scenario Outline: As a student, I cannot categorize a unexisting task (error flow)
         Given category with title 'HIGH Priority' is created
-        When student creates an instance of relationship for unexisting task
-        Then the system should send 'Could not find parent thing for relationship' as error message
+        When student creates an instance of relationship for unexisting task with id <id>
+        Then the system should send <error> as error message
+        Examples:
+            | id        | error                                                                     |
+            | 123456789 | 'Could not find parent thing for relationship todos/123456789/categories' |
+            | 987654321 | 'Could not find parent thing for relationship todos/987654321/categories' |
+            | 192837465 | 'Could not find parent thing for relationship todos/192837465/categories' |

@@ -28,6 +28,11 @@ Feature: THING-009: Adjust the priority of a task
         When student recategorizes existing tasks with priority 'HIGH Priority'
         Then the corresponding tasks should still be categorized with priority 'HIGH Priority'
 
-    Scenario: As a student, I cannot adjust priority of unexisting task (error flow)
-        When student adjusts priority of unexisting task
-        Then the system should send 'Could not find parent thing for relationship' as error message
+    Scenario Outline: As a student, I cannot adjust priority of unexisting task (error flow)
+        When student adjusts priority of unexisting task with id <id>
+        Then the system should send <error> as error message
+        Examples:
+            | id        | error                                                                     |
+            | 123456789 | 'Could not find parent thing for relationship todos/123456789/categories' |
+            | 987654321 | 'Could not find parent thing for relationship todos/987654321/categories' |
+            | 192837465 | 'Could not find parent thing for relationship todos/192837465/categories' |

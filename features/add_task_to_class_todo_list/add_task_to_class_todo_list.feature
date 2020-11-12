@@ -32,6 +32,12 @@ Feature: THING-002: Add a task to a class todo list
             | 'Understand cucumber on NodeJs' | 'Focus on implementation' |
             | 'Write Gherkin scripts'         | ''                        |
 
-    Scenario: As a student, I cannot add unexisting task to class todo list (error flow)
-        When student adds unexisting task to class todo list
-        Then the system should send 'Could not find parent thing for relationship' as error message
+    Scenario Outline: As a student, I cannot add unexisting task to class todo list (error flow)
+        When student adds unexisting task with id <id> to class todo list
+        Then the system should send <error> as error message
+        Examples:
+            | id        | error                                                                  |
+            | 123456789 | 'Could not find parent thing for relationship todos/123456789/tasksof' |
+            | 987654321 | 'Could not find parent thing for relationship todos/987654321/tasksof' |
+            | 192837465 | 'Could not find parent thing for relationship todos/192837465/tasksof' |
+

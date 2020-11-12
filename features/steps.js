@@ -1,5 +1,5 @@
 const { Given, When, Then, After, BeforeAll, AfterAll } = require('cucumber');
-const { 
+const {
     runServer,
     shutdownServer,
     isServerUp,
@@ -29,11 +29,11 @@ const unexistingId = 123456789;
 
 let resBody;
 
-BeforeAll(async function() {
+BeforeAll(async function () {
     await runServer();
 });
 
-AfterAll(async function() {
+AfterAll(async function () {
     await shutdownServer();
 });
 
@@ -146,8 +146,8 @@ When('student creates an instance of relationship between a task and unexisting 
     resBody = await createOneRelationship('todos', todos[0].id, 'categories', unexistingId);
 });
 
-When('student creates an instance of relationship for unexisting task', async function () {
-    resBody = await createOneRelationship('todos', unexistingId, 'categories', 1);
+When('student creates an instance of relationship for unexisting task with id {int}', async function (id) {
+    resBody = await createOneRelationship('todos', id, 'categories', 1);
 });
 
 When('student changes the task description to {string}', async function (newTaskDescription) {
@@ -155,8 +155,8 @@ When('student changes the task description to {string}', async function (newTask
     await updateOne('todos', todos[0].id, { description: newTaskDescription });
 });
 
-When('student changes description of a unexisting task with description {string}', async function (newTaskDescription) {
-    resBody = await updateOne('todos', unexistingId, { description: newTaskDescription });
+When('student changes description of a unexisting task with id {int} and with description {string}', async function (id, newTaskDescription) {
+    resBody = await updateOne('todos', id, { description: newTaskDescription });
 });
 
 When('student marks task with title {string} as done', async function (taskTitle) {
@@ -164,8 +164,8 @@ When('student marks task with title {string} as done', async function (taskTitle
     await updateOne('todos', todo.id, { doneStatus: true });
 });
 
-When('student marks a unexisting task as done', async function () {
-    resBody = await updateOne('todos', unexistingId, { doneStatus: true });
+When('student marks an unexisting task with id {int} as done', async function (id) {
+    resBody = await updateOne('todos', id, { doneStatus: true });
 });
 
 When('student adds task with title {string} to class todo list', async function (taskTitle) {
@@ -174,9 +174,9 @@ When('student adds task with title {string} to class todo list', async function 
     await createOneRelationship('todos', todo.id, 'tasksof', project.id);
 });
 
-When('student adds unexisting task to class todo list', async function () {
+When('student adds unexisting task with id {int} to class todo list', async function (id) {
     const project = (await getAll('projects'))[0];
-    resBody = await createOneRelationship('todos', unexistingId, 'tasksof', project.id);
+    resBody = await createOneRelationship('todos', id, 'tasksof', project.id);
 });
 
 When('student removes previous categorization with priority {string}', async function (categoryTitle) {
@@ -193,9 +193,9 @@ When('student recategorizes existing tasks with priority {string}', async functi
     await createMultipleRelationships('todos', todoIds, 'categories', category.id);
 });
 
-When('student adjusts priority of unexisting task', async function () {
+When('student adjusts priority of unexisting task with id {int}', async function (id) {
     const category = (await getAll('categories'))[0];
-    resBody = await createOneRelationship('todos', unexistingId, 'categories', category.id);
+    resBody = await createOneRelationship('todos', id, 'categories', category.id);
 });
 
 When('student removes task with title {string} from class {string}', async function (taskTitle, projectTitle) {
@@ -204,9 +204,8 @@ When('student removes task with title {string} from class {string}', async funct
     await deleteOneRelationship('todos', todo.id, 'tasksof', project.id);
 });
 
-When('student removes task from unexisting class todo list', async function () {
-    const todo = (await getAll('todos'))[0];
-    resBody = await deleteOneRelationship('todos', todo.id, 'tasksof', unexistingId);
+When('student removes task with id {string} from unexisting class todo list with id {int}', async function (validId, id) {
+    resBody = await deleteOneRelationship('todos', parseInt(validId), 'tasksof', id);
 });
 
 When('student queries incomplete tasks of class with class title {string}', async function (projectTitle) {
@@ -232,8 +231,8 @@ When('student changes course with title {string} to be inactive', async function
     await updateOne('projects', project.id, { active: false });
 });
 
-When('student removes unexistent course', async function () {
-    resBody = await deleteOne('projects', unexistingId);
+When('student removes unexistent course with id {int}', async function (id) {
+    resBody = await deleteOne('projects', id);
 });
 
 
@@ -303,7 +302,7 @@ Then('the corresponding task should be categorized with priority {string}', asyn
 });
 
 Then('the system should send {string} as error message', async function (error) {
-    expect(resBody.errorMessages[0]).to.contain(error);
+    expect(resBody.errorMessages[0]).to.equal(error);
 });
 
 Then('the corresponding task should have the new description {string}', async function (newTaskDescription) {

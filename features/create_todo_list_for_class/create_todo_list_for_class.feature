@@ -24,6 +24,11 @@ Feature: THING-005: Create a todo list for a class
             | 'MATH240'      | 'Mathematics'            |
             | 'COMP302'      | 'Functional programming' |
 
-    Scenario: As a student, I cannot create a todo list for a class with a 'term' property (error flow)
-        When course to do list with title 'ECSE429', description 'Software validation' and term 'Fall2020' is created
+    Scenario Outline: As a student, I cannot create a todo list for a class with a 'term' property (error flow)
+        When course to do list with title <title>, description <description> and term <term> is created
         Then the system should send 'Could not find field: term' as error message
+        Examples:
+            | title     | description                | term       |
+            | 'ECSE429' | 'Software validation'      | 'Fall2020' |
+            | 'COMP551' | 'Applied machine learning' | 'Fall2019' |
+            | 'ECSE223' | 'Model based programming'  | 'Fall2018' |

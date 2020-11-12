@@ -26,6 +26,11 @@ Feature: THING-010: Change task description
             | 'COMP551 Project 2' | 'to be changed again'     | 'implement softmax regression' |
             | 'Climbing'          | 'to be changed yet again' | 'go climbing'                  |
 
-    Scenario: As a student, I cannot change description of unexisting task (error flow)
-        When student changes description of a unexisting task with description 'new task description'
-        Then the system should send 'No such todo entity instance with GUID or ID' as error message
+    Scenario Outline: As a student, I cannot change description of unexisting task (error flow)
+        When student changes description of a unexisting task with id <id> and with description 'new task description'
+        Then the system should send <error> as error message
+        Examples:
+            | id        | error                                                          |
+            | 123456789 | 'No such todo entity instance with GUID or ID 123456789 found' |
+            | 987654321 | 'No such todo entity instance with GUID or ID 987654321 found' |
+            | 192837465 | 'No such todo entity instance with GUID or ID 192837465 found' |

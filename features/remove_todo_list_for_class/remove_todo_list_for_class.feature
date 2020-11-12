@@ -29,7 +29,11 @@ Feature: THING-006: Remove a todo list for a class
             | 'ECSE428'     |
             | 'MATH240'     |
 
-
-    Scenario: As a student, I can remove a todo list for a nonexistent class (error flow)
-        When student removes unexistent course
-        Then the system should send 'Could not find any instances with projects' as error message
+    Scenario Outline: As a student, I can remove a todo list for a nonexistent class (error flow)
+        When student removes unexistent course with id <id>
+        Then the system should send <error> as error message
+        Examples:
+            | id        | error                                                  |
+            | 123456789 | 'Could not find any instances with projects/123456789' |
+            | 987654321 | 'Could not find any instances with projects/987654321' |
+            | 192837465 | 'Could not find any instances with projects/192837465' |

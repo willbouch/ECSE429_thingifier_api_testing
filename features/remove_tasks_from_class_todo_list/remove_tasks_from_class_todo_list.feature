@@ -33,6 +33,11 @@ Feature: THING-004: Remove tasks from a class todo list
             | 'Understand cucumber on NodeJs' |
             | 'Write Gherkin scripts'         |
 
-    Scenario: As a student, I cannot remove a task from unexisting class todo list (error flow)
-        When student removes task from unexisting class todo list
-        Then the system should send 'Could not find any instances' as error message
+    Scenario Outline: As a student, I cannot remove a task from unexisting class todo list (error flow)
+        When student removes task with id '1' from unexisting class todo list with id <id>
+        Then the system should send <error> as error message
+        Examples:
+            | id        | error                                                         |
+            | 123456789 | 'Could not find any instances with todos/1/tasksof/123456789' |
+            | 987654321 | 'Could not find any instances with todos/1/tasksof/987654321' |
+            | 192837465 | 'Could not find any instances with todos/1/tasksof/192837465' |
