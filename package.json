@@ -4,10 +4,11 @@
   "description": "thingifier api testing",
   "main": "index.js",
   "scripts": {
-    "test": "CHOMA_SEED=$RANDOM mocha -timeout 10000 --require choma",
-    "test:categories": "CHOMA_SEED=$RANDOM mocha --timeout --require choma 10000 test/categories.test.js --require choma",
-    "test:todos": "CHOMA_SEED=$RANDOM mocha --timeout 10000 test/todos.test.js --require choma",
-    "test:projects": "CHOMA_SEED=$RANDOM mocha --timeout 10000 test/projects.test.js --require choma",
+    "test": "CHOMA_SEED=$RANDOM mocha -timeout 10000 test/partA --require choma",
+    "test:categories": "CHOMA_SEED=$RANDOM mocha --timeout --require choma 10000 test/partA/categories.test.js --require choma",
+    "test:todos": "CHOMA_SEED=$RANDOM mocha --timeout 10000 test/partA/todos.test.js --require choma",
+    "test:projects": "CHOMA_SEED=$RANDOM mocha --timeout 10000 test/partA/projects.test.js --require choma",
+    "dynamic-analysis": "mocha --timeout 100000 test/partB",
     "cucumber": "npx cucumber-js --order random:$RANDOM"
   },
   "author": "WB, EC, LB, KM",
@@ -18,6 +19,11 @@
     "chai-http": "*",
     "child_process": "*",
     "choma": "*",
-    "cucumber": "*"
+    "cucumber": "*",
+    "statman-stopwatch": "*",
+    "node-os-utils": "*"
+  },
+  "dependencies": {
+    "timer.js": "^1.0.4"
   }
 }
