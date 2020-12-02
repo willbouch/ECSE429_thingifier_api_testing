@@ -10,18 +10,18 @@ const createOne = async (option) => {
     return { api: res.body, internal: obj };
 };
 
-const updateOne = async (option) => {
+const updateOne = async (option, id) => {
     const randomString = Math.random().toString(36).substring(7);
     const obj = { title: randomString, description: randomString };
-    const id = option === 'projects' ? 2 : 3;
-    const res = await chai.request(host).post(`/${option}/${id}`).send(obj);
+    const adjustedId = option === 'projects' ? id - 1 : id;
+    const res = await chai.request(host).post(`/${option}/${adjustedId}`).send(obj);
     return { api: res.body, internal: obj };
 };
 
-const deleteOne = async (option) => {
-    const id = option === 'projects' ? 2 : 3;
-    const res = await chai.request(host).delete(`/${option}/${id}`);
-    return res.body;
+const deleteOne = async (option, id) => {
+    const adjustedId = option === 'projects' ? id - 1 : id;
+    const res = await chai.request(host).delete(`/${option}/${adjustedId}`);
+    return res;
 };
 
 const createMultiple = async (option, num) => {

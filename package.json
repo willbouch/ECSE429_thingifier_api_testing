@@ -21,9 +21,8 @@
     "choma": "*",
     "cucumber": "*",
     "statman-stopwatch": "*",
-    "node-os-utils": "*"
-  },
-  "dependencies": {
-    "timer.js": "^1.0.4"
+    "node-os-utils": "*",
+    "json-2-csv": "*",
+    "fs": "*"
   }
 }
